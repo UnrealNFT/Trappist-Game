@@ -281,27 +281,54 @@
     border-top-color: #c55aff; border-right-color: #40f0ff; animation: fxspin 1s linear infinite; }
   @keyframes fxspin { to { transform: rotate(360deg); } }
   /* ===== ARÈNE PLEIN ÉCRAN (design Legendary Species) ===== */
-  #arena-war { position: fixed; inset: 0; z-index: 30; display: none; overflow-y: auto; color: #00ff41;
-    background: radial-gradient(ellipse at 50% 118%, rgba(0, 255, 65, .14), transparent 46%),
-                radial-gradient(ellipse at 50% -8%, rgba(0, 80, 24, .35), transparent 42%),
-                linear-gradient(180deg, #04140a 0%, #000 38%, #000 100%); }
-  #arena-war::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .55;
-    background-image: repeating-linear-gradient(0deg, rgba(0, 255, 65, .045) 0 1px, transparent 1px 3px),
-      radial-gradient(1px 1px at 12% 18%, #00ff41 50%, transparent 51%), radial-gradient(1.5px 1.5px at 68% 8%, #b6ffc9 50%, transparent 51%),
-      radial-gradient(1px 1px at 85% 30%, #00cc33 50%, transparent 51%), radial-gradient(1px 1px at 30% 70%, #00330f 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 55% 55%, #00ff41 50%, transparent 51%), radial-gradient(1px 1px at 90% 80%, #0a0 50%, transparent 51%); }
-  #arena-war::after { content: ''; position: fixed; left: 8%; right: 8%; bottom: 4%; height: 34%; pointer-events: none;
-    background: repeating-radial-gradient(ellipse at 50% 130%, #000 0 3px, transparent 3px 62px);
-    border-bottom: 2px solid rgba(0, 255, 65, .28); border-radius: 0 0 50% 50%; }
-  #arena-war.aw-shake { animation: awShake .42s linear; }
-  @keyframes awShake { 0%, 100% { transform: none; } 18% { transform: translate(-9px, 5px); } 36% { transform: translate(8px, -6px); } 54% { transform: translate(-5px, 3px); } 72% { transform: translate(3px, 2px); } }
-  .aw-boom { position: fixed; left: 50%; top: 42%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; pointer-events: none; z-index: 8;
-    background: radial-gradient(circle, rgba(230, 255, 210, .95) 0%, rgba(0, 255, 65, .55) 22%, rgba(0, 0, 0, .15) 48%, transparent 70%);
-    box-shadow: 0 0 40px rgba(0, 255, 65, .65); animation: awBoom .48s ease-out forwards; }
-  @keyframes awBoom { 0% { transform: scale(.15); opacity: 1; } 100% { transform: scale(2.8); opacity: 0; } }
-  .aw-panel { position: relative; width: min(1180px, 97vw); margin: 0 auto; padding: 14px 22px 22px; z-index: 1; }
-  .aw-head { display: flex; justify-content: space-between; align-items: center; font-family: 'Courier New', monospace; font-size: 22px; letter-spacing: 3px; color: #00ff41; text-shadow: 0 0 12px rgba(0, 255, 65, .75); }
-  #aw-close { background: #000; border: 1px solid #00ff41; color: #00ff41; border-radius: 2px; font-size: 18px; padding: 2px 10px; cursor: pointer; }
+#arena-war { position: fixed; inset: 0; z-index: 30; display: none; overflow-y: auto; color: #00ff41;
+  background: radial-gradient(ellipse at 50% 118%, rgba(0, 255, 65, .14), transparent 46%),
+              radial-gradient(ellipse at 50% -8%, rgba(0, 80, 24, .35), transparent 42%),
+              linear-gradient(180deg, #04140a 0%, #000 38%, #000 100%); }
+#arena-war::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .55;
+  background-image: repeating-linear-gradient(0deg, rgba(0, 255, 65, .045) 0 1px, transparent 1px 3px),
+    radial-gradient(1px 1px at 12% 18%, #00ff41 50%, transparent 51%), radial-gradient(1.5px 1.5px at 68% 8%, #b6ffc9 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 30%, #00cc33 50%, transparent 51%), radial-gradient(1px 1px at 30% 70%, #00330f 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 55% 55%, #00ff41 50%, transparent 51%), radial-gradient(1px 1px at 90% 80%, #0a0 50%, transparent 51%); }
+#arena-war::after { content: ''; position: fixed; left: 8%; right: 8%; bottom: 4%; height: 34%; pointer-events: none;
+  background: repeating-radial-gradient(ellipse at 50% 130%, #000 0 3px, transparent 3px 62px);
+  border-bottom: 2px solid rgba(0, 255, 65, .28); border-radius: 0 0 50% 50%; }
+#arena-war.aw-shake { animation: awShake .42s linear; }
+@keyframes awShake { 0%, 100% { transform: none; } 18% { transform: translate(-9px, 5px); } 36% { transform: translate(8px, -6px); } 54% { transform: translate(-5px, 3px); } 72% { transform: translate(3px, 2px); } }
+.aw-boom { position: fixed; left: 50%; top: 42%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; pointer-events: none; z-index: 8;
+  background: radial-gradient(circle, rgba(230, 255, 210, .95) 0%, rgba(0, 255, 65, .55) 22%, rgba(0, 0, 0, .15) 48%, transparent 70%);
+  box-shadow: 0 0 40px rgba(0, 255, 65, .65); animation: awBoom .48s ease-out forwards; }
+@keyframes awBoom { 0% { transform: scale(.15); opacity: 1; } 100% { transform: scale(2.8); opacity: 0; } }
+.aw-panel { position: relative; width: min(1180px, 97vw); margin: 0 auto; padding: 14px 22px 22px; z-index: 1; }
+.aw-head { display: flex; justify-content: space-between; align-items: center; font-family: 'Courier New', monospace; font-size: 22px; letter-spacing: 3px; color: #00ff41; text-shadow: 0 0 12px rgba(0, 255, 65, .75); }
+#aw-close { background: #000; border: 1px solid #00ff41; color: #00ff41; border-radius: 2px; font-size: 18px; padding: 2px 10px; cursor: pointer; }
+
+/* --- cartes : couleur d’espèce préservée --- */
+.awc { width: 118px; padding: 6px; border-radius: 4px; text-align: center; position: relative;
+  background: linear-gradient(165deg, #0a1a0e, #000 72%); 
+  border: 2px solid var(--sc, #00ff41); 
+  box-shadow: 0 4px 14px rgba(0,0,0,.7), inset 0 0 12px rgba(0, 255, 65, .08); }
+.awc-art { height: 86px; border-radius: 2px; background-size: cover; background-position: center top; border: 1px solid rgba(255,255,255,.12); }
+.awc-n { font-size: 11px; font-weight: 600; color: #d8ffe4; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.awc-sp { font-size: 9px; color: #5dcc78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.awc-s { font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: var(--sc, #00ff41); text-shadow: 0 0 8px var(--sc, rgba(0, 255, 65, .7)); margin-top: 1px; }
+.awc-s small { font-family: 'Courier New', monospace; font-size: 11px; color: #9dffb4; text-shadow: none; }
+.awc.fx1 { border-style: double; border-color: var(--sc, #00cc33); box-shadow: 0 0 12px var(--sc, rgba(0, 255, 65, .45)); }
+.awc.fx2 { border-color: var(--sc, #b6ff6a); box-shadow: 0 0 14px var(--sc, rgba(182, 255, 106, .55)), inset 0 0 14px rgba(0, 255, 65, .12); animation: awGlow 3s ease-in-out infinite alternate; }
+.awc.fx3 { border-color: var(--sc, #eaffea); box-shadow: 0 0 18px var(--sc, rgba(0, 255, 65, .75)), inset 0 0 18px rgba(0, 255, 65, .16); animation: awGlow 2.2s ease-in-out infinite alternate; }
+@keyframes awGlow { from { filter: brightness(1); } to { filter: brightness(1.18); } }
+.awc.hand { cursor: pointer; transition: transform .12s, box-shadow .12s; }
+.awc.hand:hover { transform: translateY(-10px) scale(1.08); box-shadow: 0 10px 22px var(--sc, rgba(0, 255, 65, .55)); z-index: 5; }
+.awc.duel { width: 190px; }
+.awc.duel .awc-art { height: 152px; }
+.awc.duel .awc-n { font-size: 14px; }
+.awc.duel .awc-sp { font-size: 11px; }
+.awc.duel .awc-s { font-size: 26px; }
+.awc.back { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 190px; height: 266px;
+  background: repeating-linear-gradient(45deg, #000, #000 8px, #031208 8px, #031208 16px); 
+  border: 2px solid var(--sc, #00ff41);
+  font-size: 58px; color: var(--sc, #00ff41); text-shadow: 0 0 18px var(--sc, rgba(0, 255, 65, .8)); }
+.awc.back small { font-size: 11px; color: #5dcc78; letter-spacing: 2px; text-shadow: none; }
   /* --- carte rectangulaire détaillée (ratio ~3:4 façon LS) --- */
   .awc { width: 118px; padding: 6px; border-radius: 4px; text-align: center; position: relative;
     background: linear-gradient(165deg, #0a1a0e, #000 72%); border: 2px solid #00ff41; box-shadow: 0 4px 14px rgba(0,0,0,.7), inset 0 0 12px rgba(0, 255, 65, .08); }
