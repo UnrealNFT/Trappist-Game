@@ -1,0 +1,17 @@
+# Trappist Legend — NÉBULA · déploiement Netlify (site statique, auto-deploy à chaque push)
+[build]
+  publish = "."
+
+# Proxy API -> backend trappist.land (Render) : même origine côté navigateur, pas de CORS.
+# Le jeu appelle /api/tc/<chemin> -> https://trappistai-backend.onrender.com/api/<chemin>
+[[redirects]]
+  from = "/api/tc/*"
+  to = "https://trappistai-backend.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# la racine ouvre directement le jeu
+[[redirects]]
+  from = "/"
+  to = "/nebula.html"
+  status = 302

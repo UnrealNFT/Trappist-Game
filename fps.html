@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phénix Legends FPS — Low-Poly Shooter</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #87CEEB; font-family: 'Poppins', sans-serif; }
+  canvas { display: block; }
+
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0; padding: 14px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+    pointer-events: none; z-index: 10;
+  }
+  .hud-box {
+    background: rgba(20, 16, 40, .55); backdrop-filter: blur(6px);
+    border: 2px solid rgba(255,255,255,.25); border-radius: 14px;
+    color: #fff; padding: 8px 18px;
+    font-family: 'Bangers', cursive; font-size: 26px; letter-spacing: 1px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,.35);
+  }
+  #hearts { font-size: 24px; letter-spacing: 3px; }
+
+  #crosshair {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    z-index: 11; pointer-events: none; width: 26px; height: 26px;
+  }
+  #crosshair::before, #crosshair::after {
+    content: ''; position: absolute; background: #fff;
+    box-shadow: 0 0 4px rgba(0,0,0,.8), 0 0 2px #ff8c1a;
+  }
+  #crosshair::before { left: 50%; top: 0; width: 2px; height: 100%; transform: translateX(-50%); clip-path: polygon(0 0, 100% 0, 100% 38%, 0 38%, 0 62%, 100% 62%, 100% 100%, 0 100%); }
+  #crosshair::after { top: 50%; left: 0; height: 2px; width: 100%; transform: translateY(-50%); clip-path: polygon(0 0, 38% 0, 38% 100%, 0 100%, 62% 0, 100% 0, 100% 100%, 62% 100%); }
+
+  #title-screen, #gameover-screen {
+    position: fixed; inset: 0; z-index: 20;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: radial-gradient(ellipse at center, rgba(30,10,60,.55), rgba(10,5,30,.85));
+    color: #fff; text-align: center;
+  }
+  #gameover-screen { display: none; }
+  h1 {
+    font-family: 'Bangers', cursive; font-size: clamp(44px, 8vw, 88px);
+    letter-spacing: 3px;
+    background: linear-gradient(180deg, #ffd76b, #ff6a3d 55%, #c737ff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(3px 4px 0 rgba(0,0,0,.45));
+  }
+  .subtitle { font-size: 18px; opacity: .9; margin: 10px 0 4px; }
+  .creatures-line { font-size: 34px; margin: 14px 0 6px; letter-spacing: 8px; }
+  .controls {
+    margin: 18px 0 26px; font-size: 15px; line-height: 1.9;
+    background: rgba(255,255,255,.08); border-radius: 12px; padding: 12px 26px;
+    border: 1px solid rgba(255,255,255,.15);
+  }
+  .controls b { color: #ffd76b; }
+  .btn {
+    font-family: 'Bangers', cursive; font-size: 30px; letter-spacing: 2px;
+    color: #2a1200; background: linear-gradient(180deg, #ffe27a, #ff9a3d);
+    border: none; border-radius: 999px; padding: 12px 44px; cursor: pointer;
+    box-shadow: 0 6px 0 #b3551d, 0 12px 24px rgba(0,0,0,.4);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .btn:hover { transform: translateY(-2px) scale(1.04); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #b3551d; }
+  #final-score { font-family: 'Bangers', cursive; font-size: 42px; color: #ffd76b; margin: 8px 0 22px; }
+
+  #pokeball-wrap {
+    position: fixed; bottom: 26px; right: 26px; z-index: 10;
+    background: rgba(20,16,40,.55); border: 2px solid rgba(255,255,255,.25);
+    border-radius: 14px; padding: 10px 16px; text-align: center;
+    font-family: 'Bangers', cursive; color: #fff; font-size: 20px; letter-spacing: 1px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,.35);
+  }
+  #pokeball-count { font-size: 30px; color: #ffd76b; }
+  #team-wrap {
+    position: fixed; bottom: 26px; left: 26px; z-index: 10;
+    display: flex; gap: 10px;
+  }
+  .team-slot {
+    width: 56px; height: 56px; border-radius: 12px;
+    background: rgba(20,16,40,.55); border: 2px solid rgba(255,255,255,.3);
+    display: flex; align-items: center; justify-content: center; font-size: 30px;
+    filter: drop-shadow(0 0 8px rgba(255,215,107,.4));
+  }
+
+  #wave-banner {
+    position: fixed; top: 30%; left: 50%; transform: translate(-50%,-50%) scale(.5);
+    font-family: 'Bangers', cursive; font-size: 72px; color: #fff;
+    text-shadow: 0 0 24px #c737ff, 3px 4px 0 rgba(0,0,0,.5);
+    opacity: 0; pointer-events: none; z-index: 15; transition: all .35s ease-out;
+  }
+  #wave-banner.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+
+  #vignette-hit {
+    position: fixed; inset: 0; pointer-events: none; z-index: 12;
+    box-shadow: inset 0 0 140px 50px rgba(255,30,30,.6);
+    opacity: 0; transition: opacity .5s;
+  }
+  #kill-pop {
+    position: fixed; top: 58%; left: 50%; transform: translateX(-50%);
+    font-family: 'Bangers', cursive; font-size: 34px; color: #ffd76b;
+    text-shadow: 2px 3px 0 rgba(0,0,0,.5); opacity: 0; pointer-events: none; z-index: 15;
+    transition: opacity .4s;
+  }
+  #boss-wrap {
+    position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
+    width: min(480px, 70vw); z-index: 10; display: none; pointer-events: none;
+    background: rgba(20,16,40,.6); border: 2px solid #ff5544; border-radius: 12px; padding: 6px 10px 10px;
+  }
+  #boss-name { font-family: 'Bangers', cursive; color: #ff8866; text-align: center; font-size: 18px; letter-spacing: 2px; }
+  #boss-bar { height: 14px; background: #3a1220; border-radius: 8px; overflow: hidden; }
+  #boss-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ff2d55, #ff9a3d); transition: width .2s; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div class="hud-box">SCORE <span id="score">0</span></div>
+  <div class="hud-box">VAGUE <span id="wave">1</span> · <span id="left">0</span> 👾</div>
+  <div class="hud-box" id="hearts">❤️❤️❤️</div>
+</div>
+
+<div id="crosshair"></div>
+<div id="team-wrap"></div>
+<div id="pokeball-wrap">🎯 ORBES<br><span id="pokeball-count">0</span></div>
+<div id="boss-wrap">
+  <div id="boss-name">🐉 DRAGON ANCIEN — BOSS</div>
+  <div id="boss-bar"><div id="boss-fill"></div></div>
+</div>
+<div id="wave-banner">VAGUE 1</div>
+<div id="kill-pop"></div>
+<div id="vignette-hit"></div>
+
+<div id="title-screen">
+  <h1>PHÉNIX LEGENDS FPS</h1>
+  <div class="creatures-line">🔥🐢🐉🐘</div>
+  <div class="subtitle">FPS cartoon low-poly — défends l'île légendaire !</div>
+  <div class="controls">
+    <b>🖱️ SOURIS</b> — viser · <b>CLIC</b> — tirer · <b>CLIC DROIT</b> — shotgun 🔥<br>
+    <b>⬆️⬇️⬅️➡️ FLÈCHES / ZQSD</b> — bouger · <b>ESPACE</b> — sauter<br>
+    <b>🎯 C</b> — lancer une ORBE sur une créature affaiblie (elle clignote !) → <b>elle rejoint ton équipe</b> et te protège !<br>
+    🐢 Turtlien · 🐉 Dragon (crache du feu) · 🐘 Éléphantien (charge !)<br>
+    🔥 Touche le <b>Phénix doré</b> = bonus + orbes de capture !<br>
+    ⚠️ BOSS toutes les 5 vagues... Chaque vague = plus d'ennemis, plus rapides...
+  </div>
+  <button class="btn" id="start-btn">JOUER 🔥</button>
+</div>
+
+<div id="gameover-screen">
+  <h1>GAME OVER</h1>
+  <div class="subtitle">L'île est envahie... mais le Phénix renaîtra !</div>
+  <div id="final-score">SCORE : 0</div>
+  <button class="btn" id="restart-btn">REJOUER 🔥</button>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+} }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { clone as skClone } from 'three/addons/utils/SkeletonUtils.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+/* ============================== BASE ============================== */
+const ARENA_R = 38;
+const scene = new THREE.Scene();
+// ciel en dégradé cartoon (canvas texture)
+{
+  const c = document.createElement('canvas'); c.width = 2; c.height = 512;
+  const ctx = c.getContext('2d');
+  const g = ctx.createLinearGradient(0, 0, 0, 512);
+  g.addColorStop(0, '#5aa9e8'); g.addColorStop(.55, '#8fd8ff'); g.addColorStop(.8, '#ffe8b8'); g.addColorStop(1, '#ffd79a');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 2, 512);
+  const tex = new THREE.CanvasTexture(c);
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  scene.background = tex;
+}
+scene.fog = new THREE.Fog(0x8fd8ff, 55, 130);
+
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, .1, 300);
+camera.rotation.order = 'YXZ';
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+// bloom : tout ce qui est lumineux (feu, cristaux, orbes) rayonne ✨
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), .35, .6, .82);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.HemisphereLight(0xfff3d6, 0x7a5fd0, 1.15));
+const sun = new THREE.DirectionalLight(0xffe9b0, 1.6);
+sun.position.set(30, 50, 20);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -50; sun.shadow.camera.right = 50;
+sun.shadow.camera.top = 50; sun.shadow.camera.bottom = -50;
+scene.add(sun);
+
+const mat = (color) => new THREE.MeshLambertMaterial({ color, flatShading: true });
+function mesh(geo, color, x = 0, y = 0, z = 0) {
+  const m = new THREE.Mesh(geo, mat(color));
+  m.position.set(x, y, z);
+  m.castShadow = true;
+  return m;
+}
+
+/* ============ MODÈLES 3D IA (Tripo3D / Meshy → fichiers .glb) ============
+   Pose tes modèles générés dans le dossier  models/  à côté de ce fichier :
+   models/turtle.glb, models/dragon.glb, models/elephant.glb,
+   models/phoenix.glb, models/boss.glb
+   → si le fichier existe, il remplace la version "cubes" (avec son animation
+     intégrée si le .glb en contient une). Sinon, fallback low-poly auto.
+   Le loader AUTO-NORMALISE chaque modèle (bounding box → hauteur cible,
+   pieds au sol) donc n'importe quelle échelle/orientation d'export marche.
+   Les meshes restent ancrés au groupe : on les "bob" (rebond cartoon) en code.
+   ⚠️ Les .glb ne se chargent PAS en file:// : lance un mini serveur local. */
+const MODEL_URLS = {
+  turtle: 'models/turtle.glb', dragon: 'models/dragon.glb',
+  elephant: 'models/elephant.glb', phoenix: 'models/phoenix.glb', boss: 'models/boss.glb',
+};
+// hauteur cible en unités de jeu (≈ taille des versions cubes)
+const MODEL_HEIGHTS = { turtle: 2.2, dragon: 3, elephant: 3.2, phoenix: 2, boss: 9 };
+const modelCache = {};
+const gltfLoader = new GLTFLoader();
+{ // support Draco (compression des gros .glb Tripo)
+  const draco = new DRACOLoader();
+  draco.setDecoderPath('https://unpkg.com/three@0.160.0/examples/jsm/libs/draco/gltf/');
+  gltfLoader.setDRACOLoader(draco);
+}
+for (const [key, url] of Object.entries(MODEL_URLS)) {
+  gltfLoader.load(url, g => { modelCache[key] = g; }, undefined, () => { /* pas de modèle → fallback */ });
+}
+function creatureFromModel(type) {
+  const src = modelCache[type];
+  if (!src) return null;
+  const inner = skClone(src.scene);
+  const g = new THREE.Group();
+  g.add(inner);
+  // auto-normalisation : bounding box → taille cible, pieds au sol
+  const box = new THREE.Box3().setFromObject(inner);
+  const size = box.getSize(new THREE.Vector3());
+  const h = Math.max(size.x, size.y, size.z) || 1;
+  const s = (MODEL_HEIGHTS[type] || 2) / h;
+  inner.scale.setScalar(s);
+  inner.position.set(
+    -(box.min.x + size.x / 2) * s,
+    -box.min.y * s,
+    -(box.min.z + size.z / 2) * s
+  );
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+  if (src.animations && src.animations.length) {
+    const mixer = new THREE.AnimationMixer(g);
+    mixer.clipAction(src.animations[0]).play();
+    g.userData.mixer = mixer;
+  }
+  g.userData.animMesh = inner; // pour le bob cartoon
+  return g;
+}
+
+/* ============================== ÎLE ============================== */
+{
+  const top = mesh(new THREE.CylinderGeometry(ARENA_R + 3, ARENA_R - 2, 7, 24, 1), 0x58c26a, 0, -3.5, 0);
+  const pos = top.geometry.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i);
+    if (Math.hypot(x, z) > ARENA_R - 4) {
+      pos.setX(i, x + (Math.random() - .5) * 2.2);
+      pos.setZ(i, z + (Math.random() - .5) * 2.2);
+      pos.setY(i, pos.getY(i) + (Math.random() - .5) * 1.2);
+    }
+  }
+  top.geometry.computeVertexNormals();
+  top.receiveShadow = true;
+  scene.add(top);
+
+  for (let i = 0; i < 16; i++) {
+    const a = Math.random() * Math.PI * 2, r = ARENA_R - 4 - Math.random() * 10;
+    const tree = new THREE.Group();
+    tree.add(mesh(new THREE.CylinderGeometry(.35, .5, 2.4, 5), 0x8a5a33, 0, 1.2, 0));
+    tree.add(mesh(new THREE.ConeGeometry(1.9, 3.6, 6), Math.random() < .5 ? 0x2ea44f : 0x7ac74f, 0, 3.8, 0));
+    tree.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    scene.add(tree);
+  }
+  for (let i = 0; i < 10; i++) {
+    const a = Math.random() * Math.PI * 2, r = 10 + Math.random() * (ARENA_R - 14);
+    const rock = mesh(new THREE.IcosahedronGeometry(.7 + Math.random(), 0), 0x9aa3b2);
+    rock.position.set(Math.cos(a) * r, .4, Math.sin(a) * r);
+    rock.scale.y = .6;
+    scene.add(rock);
+  }
+}
+
+const clouds = [];
+for (let i = 0; i < 10; i++) {
+  const c = new THREE.Group();
+  const n = 3 + (Math.random() * 3 | 0);
+  for (let j = 0; j < n; j++) {
+    const puff = mesh(new THREE.IcosahedronGeometry(1.5 + Math.random() * 1.8, 0), 0xffffff, j * 2 - n, Math.random(), Math.random());
+    puff.castShadow = false;
+    c.add(puff);
+  }
+  c.position.set((Math.random() - .5) * 160, 22 + Math.random() * 18, (Math.random() - .5) * 160);
+  scene.add(c);
+  clouds.push({ g: c, s: .4 + Math.random() * .8 });
+}
+
+/* ============================== CRÉATURES ============================== */
+function makeTurtle() {
+  const m = creatureFromModel('turtle');
+  if (m) return m;
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.SphereGeometry(1.3, 7, 5, 0, Math.PI * 2, 0, Math.PI / 2), 0x2a9d8f, 0, .5, 0));
+  g.add(mesh(new THREE.CylinderGeometry(1.25, 1.35, .6, 7), 0xe9c46a, 0, .3, 0));
+  g.add(mesh(new THREE.IcosahedronGeometry(.5, 0), 0xe9c46a, 0, .7, 1.5));
+  for (const [x, z] of [[-1, .9], [1, .9], [-1, -.9], [1, -.9]])
+    g.add(mesh(new THREE.CylinderGeometry(.28, .34, .6, 5), 0xd4a94e, x, .3, z));
+  return g;
+}
+function makeElephant() {
+  const m = creatureFromModel('elephant');
+  if (m) return m;
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.IcosahedronGeometry(1.5, 0), 0xb08ad8, 0, 1.5, 0));
+  g.add(mesh(new THREE.IcosahedronGeometry(.9, 0), 0xc39ee0, 0, 2.2, 1.3));
+  const trunk = mesh(new THREE.CylinderGeometry(.18, .3, 1.4, 5), 0xa87fd0, 0, 1.4, 2);
+  trunk.rotation.x = .5;
+  g.add(trunk);
+  for (const side of [-1, 1]) {
+    const ear = mesh(new THREE.ConeGeometry(.8, 1.2, 4), 0x9a6fc8, side, 2.3, 1.1);
+    ear.rotation.z = side * 1.8;
+    const tusk = mesh(new THREE.ConeGeometry(.12, .8, 4), 0xfff6dc, side * .4, 1.7, 2);
+    tusk.rotation.x = 2.6;
+    g.add(ear, tusk);
+  }
+  for (const [x, z] of [[-.8, .7], [.8, .7], [-.8, -.7], [.8, -.7]])
+    g.add(mesh(new THREE.CylinderGeometry(.35, .42, 1.4, 6), 0x9a6fc8, x, .7, z));
+  return g;
+}
+function makeDragon() {
+  const m = creatureFromModel('dragon');
+  if (m) return m;
+  const g = new THREE.Group();
+  const body = mesh(new THREE.ConeGeometry(.9, 3.4, 6), 0x3fae5a);
+  body.rotation.x = Math.PI / 2;
+  g.add(body, mesh(new THREE.IcosahedronGeometry(.65, 0), 0x2e8b47, 0, .3, 1.9));
+  for (const side of [-1, 1]) {
+    g.add(mesh(new THREE.ConeGeometry(.12, .6, 4), 0xfff0c0, side * .25, .8, 1.8));
+    const wing = mesh(new THREE.ConeGeometry(.7, 3, 4), 0x8fe06a, side * 1.8, .3, 0);
+    wing.geometry.translate(0, side * 1.2, 0);
+    wing.geometry.rotateZ(-side * Math.PI / 2.2);
+    g.add(wing);
+  }
+  const tail = mesh(new THREE.ConeGeometry(.3, 2, 5), 0x2e8b47, 0, 0, -2.3);
+  tail.rotation.x = -Math.PI / 2;
+  g.add(tail);
+  return g;
+}
+function makePhoenix() { // bonus doré
+  const m = creatureFromModel('phoenix');
+  if (m) return m;
+  const g = new THREE.Group();
+  const body = mesh(new THREE.ConeGeometry(.6, 2, 6), 0xffd76b);
+  body.rotation.x = Math.PI / 2;
+  g.add(body, mesh(new THREE.IcosahedronGeometry(.45, 0), 0xffe9a8, 0, .3, 1.1));
+  for (const side of [-1, 1]) {
+    const wing = mesh(new THREE.ConeGeometry(.45, 2.4, 4), 0xffb03a, side * 1.3, .1, 0);
+    wing.geometry.translate(0, side * 1, 0);
+    wing.geometry.rotateZ(-side * Math.PI / 2);
+    g.add(wing);
+  }
+  const glow = new THREE.PointLight(0xffc040, 3, 8);
+  g.add(glow);
+  return g;
+}
+function makeBoss() { // Dragon Ancien = dragon géant teinté feu
+  const m = creatureFromModel('boss');
+  if (m) return m;
+  const g = makeDragon();
+  g.scale.setScalar(3);
+  g.traverse(o => {
+    if (o.isMesh) { o.material = o.material.clone(); o.material.color.lerp(new THREE.Color(0x881111), .45); }
+  });
+  return g;
+}
+
+/* ------- assets map épique (procédural cartoon, zéro téléchargement) ------- */
+function makeFlower() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(.03, .05, .5, 4), 0x3d9948, 0, .25, 0));
+  const petal = mesh(new THREE.IcosahedronGeometry(.16, 0), [0xff5a8c, 0xffd76b, 0xc737ff, 0xff8c1a][Math.random() * 4 | 0], 0, .55, 0);
+  petal.scale.y = .5;
+  g.add(petal);
+  return g;
+}
+function makeMushroom() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(.12, .2, .5, 5), 0xf5ead6, 0, .25, 0));
+  g.add(mesh(new THREE.ConeGeometry(.45, .4, 6), Math.random() < .5 ? 0xff4d4d : 0xff9a3d, 0, .62, 0));
+  return g;
+}
+function makeCrystal() {
+  const g = new THREE.Group();
+  const c1 = mesh(new THREE.ConeGeometry(.3, 1.6, 5), 0x8ff2ff, 0, .8, 0);
+  const c2 = mesh(new THREE.ConeGeometry(.2, 1, 5), 0x5ad8e8, .35, .4, .1);
+  c2.rotation.z = -.5;
+  const glow = new THREE.PointLight(0x66e0ff, 4, 5);
+  glow.position.y = .8;
+  g.add(c1, c2, glow);
+  return g;
+}
+function makeRuin() { // pilier de pierre antique
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.BoxGeometry(1.2, .5, 1.2), 0x8a8fa3, 0, .25, 0));
+  const h = 1.5 + Math.random() * 2;
+  g.add(mesh(new THREE.CylinderGeometry(.42, .5, h, 6), 0x9aa0b8, 0, .5 + h / 2, 0));
+  if (Math.random() < .5) g.add(mesh(new THREE.BoxGeometry(1.1, .35, 1.1), 0x8a8fa3, 0, .5 + h + .17, 0));
+  g.rotation.y = Math.random() * Math.PI;
+  return g;
+}
+function makeBigTree() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(.5, .8, 3.5, 5), 0x6d4428, 0, 1.75, 0));
+  const c = [0xff6b6b, 0xffd93d, 0xff9a3d][Math.random() * 3 | 0]; // automne cartoon
+  g.add(mesh(new THREE.IcosahedronGeometry(2.2, 0), c, 0, 4.4, 0));
+  return g;
+}
+function makeTorch() {
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(.08, .12, 1.6, 5), 0x5a3a22, 0, .8, 0));
+  const flame = mesh(new THREE.ConeGeometry(.22, .6, 5), 0xffb03a, 0, 1.9, 0);
+  g.add(flame);
+  const glow = new THREE.PointLight(0xff8c30, 6, 8);
+  glow.position.y = 1.9;
+  g.add(glow);
+  g.userData.flame = flame;
+  return g;
+}
+function makeStatue() { // tête de dragon antique
+  const g = new THREE.Group();
+  const head = mesh(new THREE.IcosahedronGeometry(1.4, 0), 0x7d8496, 0, 1.4, 0);
+  const horn1 = mesh(new THREE.ConeGeometry(.25, 1.2, 4), 0x6b7280, .8, 2.4, -.3);
+  horn1.rotation.z = -.4;
+  const horn2 = horn1.clone(); horn2.position.x = -.8; horn2.rotation.z = .4;
+  const moss = mesh(new THREE.IcosahedronGeometry(.5, 0), 0x58c26a, -.6, 2.2, .4);
+  g.add(head, horn1, horn2, moss);
+  g.rotation.y = Math.random() * Math.PI * 2;
+  return g;
+}
+
+const mapAssets = []; // pour l'animation des torches
+function buildEpicMap() {
+  // anneau de torches autour de l'arène
+  for (let i = 0; i < 8; i++) {
+    const a = i / 8 * Math.PI * 2;
+    const t = makeTorch();
+    t.position.set(Math.cos(a) * (ARENA_R - 1.5), 0, Math.sin(a) * (ARENA_R - 1.5));
+    scene.add(t);
+    mapAssets.push(t);
+  }
+  // ruines antiques éparpillées
+  for (let i = 0; i < 7; i++) {
+    const a = Math.random() * Math.PI * 2, r = 6 + Math.random() * (ARENA_R - 12);
+    const ru = makeRuin();
+    ru.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    scene.add(ru);
+  }
+  // statues dragon
+  for (let i = 0; i < 3; i++) {
+    const a = Math.random() * Math.PI * 2, r = ARENA_R * .55;
+    const s = makeStatue();
+    s.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    scene.add(s);
+  }
+  // grands arbres automne
+  for (let i = 0; i < 8; i++) {
+    const a = Math.random() * Math.PI * 2, r = ARENA_R - 6 - Math.random() * 4;
+    const tr = makeBigTree();
+    tr.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    scene.add(tr);
+  }
+  // tapis de fleurs
+  for (let i = 0; i < 40; i++) {
+    const a = Math.random() * Math.PI * 2, r = Math.random() * (ARENA_R - 3);
+    const f = makeFlower();
+    f.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    f.rotation.y = Math.random() * Math.PI;
+    scene.add(f);
+  }
+  // champignons
+  for (let i = 0; i < 14; i++) {
+    const a = Math.random() * Math.PI * 2, r = 4 + Math.random() * (ARENA_R - 8);
+    const m = makeMushroom();
+    m.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    scene.add(m);
+  }
+  // cristaux magiques lumineux
+  for (let i = 0; i < 6; i++) {
+    const a = Math.random() * Math.PI * 2, r = 8 + Math.random() * (ARENA_R - 14);
+    const c = makeCrystal();
+    c.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    scene.add(c);
+  }
+}
+
+/* ============================== ARME (vue FPS) ============================== */
+const gun = new THREE.Group();
+{
+  const body = mesh(new THREE.BoxGeometry(.16, .2, .7), 0x3a2b55, 0, 0, 0);
+  const tip = mesh(new THREE.CylinderGeometry(.09, .13, .3, 6), 0xff8c1a, 0, 0, -.45);
+  tip.rotation.x = Math.PI / 2;
+  const grip = mesh(new THREE.BoxGeometry(.13, .3, .16), 0x2a1e40, 0, -.22, .2);
+  grip.rotation.x = .3;
+  const crystal = mesh(new THREE.IcosahedronGeometry(.08, 0), 0xff5a2a, 0, .14, -.1);
+  gun.add(body, tip, grip, crystal);
+  gun.traverse(o => { o.castShadow = false; });
+  const muzzle = new THREE.PointLight(0xff7a30, 0, 5);
+  muzzle.position.set(0, 0, -.7);
+  gun.add(muzzle);
+  gun.userData.muzzle = muzzle;
+}
+gun.position.set(.35, -.32, -.7);
+camera.add(gun);
+scene.add(camera);
+
+/* ============================== PARTICULES ============================== */
+const PMAX = 500;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(PMAX * 3);
+const pVel = new Float32Array(PMAX * 3);
+const pLife = new Float32Array(PMAX);
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+function makeDotTexture() { // sprite rond doux pour les particules de feu
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,230,1)');
+  g.addColorStop(.35, 'rgba(255,190,80,.9)');
+  g.addColorStop(1, 'rgba(255,110,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+const pMat = new THREE.PointsMaterial({ color: 0xffc060, size: .5, map: makeDotTexture(), transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false });
+const particles = new THREE.Points(pGeo, pMat);
+particles.frustumCulled = false;
+scene.add(particles);
+let pHead = 0;
+function emit(pos, n, spread = .5, power = 3) {
+  for (let i = 0; i < n; i++) {
+    const j = pHead = (pHead + 1) % PMAX;
+    pPos[j*3] = pos.x + (Math.random()-.5)*spread; pPos[j*3+1] = pos.y + (Math.random()-.5)*spread; pPos[j*3+2] = pos.z + (Math.random()-.5)*spread;
+    pVel[j*3] = (Math.random()-.5)*power*2; pVel[j*3+1] = Math.random()*power; pVel[j*3+2] = (Math.random()-.5)*power*2;
+    pLife[j] = 1;
+  }
+}
+
+/* ============================== AUDIO ============================== */
+let AC = null;
+function beep(freq, dur = .12, type = 'square', vol = .12, slide = 0) {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, AC.currentTime);
+  if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, slide), AC.currentTime + dur);
+  g.gain.setValueAtTime(vol, AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, AC.currentTime + dur);
+  o.connect(g).connect(AC.destination);
+  o.start(); o.stop(AC.currentTime + dur);
+}
+const sfx = {
+  shoot: () => beep(700, .12, 'square', .1, 180),
+  boom: () => { beep(160, .3, 'sawtooth', .18, 40); beep(90, .35, 'square', .1, 30); },
+  hurt: () => beep(120, .3, 'sawtooth', .2, 60),
+  heal: () => { beep(660, .12, 'sine', .14); setTimeout(() => beep(990, .15, 'sine', .12), 90); },
+  wave: () => { beep(523, .15, 'square', .12); setTimeout(() => beep(784, .2, 'square', .12), 120); },
+  fireball: () => beep(300, .25, 'sawtooth', .08, 90),
+  over: () => { beep(220, .4, 'sawtooth', .18, 110); setTimeout(() => beep(147, .6, 'sawtooth', .18, 60), 250); },
+};
+
+/* ============================== ÉTAT ============================== */
+const keys = {};
+addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code.startsWith('Arrow')) e.preventDefault();
+  if (e.code === 'KeyC') throwPokeball();
+});
+addEventListener('keyup', e => keys[e.code] = false);
+
+// orbe de capture (Pokéball-like)
+const ballGeo = new THREE.SphereGeometry(.32, 8, 6);
+const ballMat = new THREE.MeshLambertMaterial({ color: 0xff3355, emissive: 0x881122, flatShading: true });
+function throwPokeball() {
+  if (!S.running || S.orbs <= 0) return;
+  // vise la créature affaiblie la plus proche dans la direction du regard
+  const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+  let best = null, bestDot = .6;
+  for (const e of enemies) {
+    if (e.type === 'boss' || e.hp >= e.maxHp) continue; // faut l'affaiblir d'abord !
+    tmpV.copy(e.g.position); tmpV.y += 1;
+    const to = tmpV.sub(P.pos);
+    const d = to.length();
+    if (d > 30) continue;
+    const dot = to.normalize().dot(dir);
+    if (dot > bestDot) { bestDot = dot; best = e; }
+  }
+  if (!best) { killPop('🎯 Aucune créature affaiblie visée !'); return; }
+  S.orbs--;
+  updateHUD();
+  sfx.dash();
+  const m = new THREE.Mesh(ballGeo, ballMat);
+  m.position.copy(P.pos).addScaledVector(dir, 1);
+  scene.add(m);
+  tmpV.copy(best.g.position); tmpV.y += 1;
+  teamBalls.push({ m, target: best, vel: tmpV.sub(m.position).normalize().multiplyScalar(18), spin: 0 });
+}
+
+function capture(e) {
+  // retire l'ennemi, l'ajoute à l'équipe
+  const idx = enemies.indexOf(e);
+  if (idx < 0) return;
+  enemies.splice(idx, 1);
+  e.g.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.emissive = new THREE.Color(0x224422); } });
+  team.push({ type: e.type, g: e.g, atkT: 0, followA: Math.random() * Math.PI * 2 });
+  e.g.scale.multiplyScalar(.8);
+  S.score += 15 * S.wave;
+  sfx.heal();
+  killPop('🎯 ' + (TEAM_EMOJI[e.type] || '⭐') + ' CAPTURÉ ! +' + 15 * S.wave);
+  updateHUD();
+  if (enemies.length === 0 && S.pending === 0) { S.score += 25 * S.wave; killPop('✨ VAGUE ' + S.wave + ' CLEAR !'); S.wave++; startWave(); }
+}
+
+const P = { // joueur
+  pos: new THREE.Vector3(0, 1.7, 12),
+  vel: new THREE.Vector3(),
+  yaw: 0, pitch: 0, vy: 0, grounded: true,
+  hearts: 3, invuln: 0,
+};
+const S = { running: false, score: 0, wave: 1, shootCD: 0, recoil: 0, phoenixT: 12, pending: 0, orbs: 3, slowmo: 0 };
+const team = []; // créatures capturées qui te protègent
+const teamBalls = []; // orbes de capture en vol
+const TEAM_EMOJI = { turtle: '🐢', elephant: '🐘', dragon: '🐉', phoenix: '🔥' };
+const enemies = [];
+const bullets = [];   // tirs du joueur
+const fireballs = []; // projectiles du dragon
+let bonusPhoenix = null;
+const $ = id => document.getElementById(id);
+
+const STATS = {
+  turtle:   { hp: 1, speed: 3.2, hitR: 2.0, score: 10 },
+  dragon:   { hp: 2, speed: 6,   hitR: 2.2, score: 25 },
+  elephant: { hp: 3, speed: 2.2, hitR: 2.6, score: 20 },
+  boss:     { hp: 20, speed: 3.5, hitR: 5, score: 200 },
+};
+
+function spawnEnemy(type) {
+  const g = type === 'boss' ? makeBoss() : type === 'dragon' ? makeDragon() : type === 'turtle' ? makeTurtle() : makeElephant();
+  const a = Math.random() * Math.PI * 2, r = ARENA_R - 3;
+  const flying = type === 'dragon' || type === 'boss';
+  g.position.set(Math.cos(a) * r, flying ? 9 : 0, Math.sin(a) * r);
+  scene.add(g);
+  emit(g.position, 24, 2, 3);
+  const hp = type === 'boss' ? 10 + S.wave * 2 : STATS[type].hp;
+  enemies.push({
+    type, g, hp, maxHp: hp,
+    state: 'roam', t: 1 + Math.random() * 2,
+    dir: new THREE.Vector3(), shootT: 2,
+  });
+  if (type === 'boss') killPop('🐉 LE DRAGON ANCIEN ARRIVE !');
+}
+
+function waveComp(n) { // composition de chaque vague
+  if (n % 5 === 0) return { turtle: 2, elephant: 2, boss: 1 }; // vague BOSS toutes les 5
+  return {
+    turtle: 1 + n,
+    elephant: Math.floor(n / 2),
+    dragon: Math.floor((n - 1) / 2),
+  };
+}
+
+function startWave() {
+  const comp = waveComp(S.wave);
+  let i = 0;
+  for (const [type, count] of Object.entries(comp))
+    for (let k = 0; k < count; k++) {
+      S.pending++;
+      setTimeout(() => { S.pending--; if (S.running) spawnEnemy(type); }, i++ * 1200);
+    }
+  const b = $('wave-banner');
+  b.textContent = S.wave % 5 === 0 ? '⚠️ BOSS — VAGUE ' + S.wave : 'VAGUE ' + S.wave;
+  b.classList.add('show');
+  setTimeout(() => b.classList.remove('show'), 1400);
+  if (S.wave > 1) sfx.wave();
+  updateHUD();
+}
+
+function updateHUD() {
+  $('score').textContent = S.score;
+  $('wave').textContent = S.wave;
+  $('left').textContent = enemies.length + S.pending;
+  $('hearts').textContent = '❤️'.repeat(P.hearts) + '🖤'.repeat(Math.max(0, 3 - P.hearts));
+  $('pokeball-count').textContent = S.orbs;
+  const tw = $('team-wrap');
+  tw.innerHTML = team.map(m => `<div class="team-slot">${TEAM_EMOJI[m.type] || '⭐'}</div>`).join('');
+}
+
+function killPop(txt) {
+  const k = $('kill-pop');
+  k.textContent = txt;
+  k.style.opacity = 1;
+  clearTimeout(k._t);
+  k._t = setTimeout(() => k.style.opacity = 0, 700);
+}
+
+function damagePlayer() {
+  if (P.invuln > 0 || !S.running) return;
+  P.hearts--; P.invuln = 1.2;
+  sfx.hurt();
+  emit(P.pos, 20, 1, 2);
+  $('vignette-hit').style.opacity = 1;
+  setTimeout(() => $('vignette-hit').style.opacity = 0, 200);
+  updateHUD();
+  if (P.hearts <= 0) {
+    S.running = false;
+    sfx.over();
+    document.exitPointerLock();
+    $('final-score').textContent = 'SCORE : ' + S.score;
+    $('gameover-screen').style.display = 'flex';
+  }
+}
+
+function resetGame() {
+  S.score = 0; S.wave = 1; S.shootCD = 0; S.recoil = 0; S.phoenixT = 15; S.pending = 0; S.orbs = 3; S.slowmo = 0;
+  P.pos.set(0, 1.7, 12); P.vel.set(0, 0, 0); P.yaw = 0; P.pitch = 0; P.vy = 0;
+  P.hearts = 3; P.invuln = 0;
+  for (const e of enemies) scene.remove(e.g);
+  enemies.length = 0;
+  for (const b of bullets) scene.remove(b.m);
+  bullets.length = 0;
+  for (const f of fireballs) scene.remove(f.m);
+  fireballs.length = 0;
+  for (const m of team) scene.remove(m.g);
+  team.length = 0;
+  for (const b of teamBalls) scene.remove(b.m);
+  teamBalls.length = 0;
+  if (bonusPhoenix) { scene.remove(bonusPhoenix.g); bonusPhoenix = null; }
+  updateHUD();
+  startWave();
+}
+
+/* ============================== TIR ============================== */
+const bulletGeo = new THREE.IcosahedronGeometry(.18, 0);
+const bulletMat = new THREE.MeshLambertMaterial({ color: 0xffd76b, emissive: 0xff5a00, flatShading: true });
+function shoot() {
+  if (S.shootCD > 0 || !S.running) return;
+  S.shootCD = .22;
+  S.recoil = 1;
+  gun.userData.muzzle.intensity = 6;
+  sfx.shoot();
+  const m = new THREE.Mesh(bulletGeo, bulletMat);
+  const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+  m.position.copy(P.pos).addScaledVector(dir, 1.4);
+  m.position.y -= .15;
+  scene.add(m);
+  bullets.push({ m, vel: dir.multiplyScalar(55), life: 1.6 });
+}
+function shotgun() { // clic droit : 7 plombs en éventail
+  if (S.shootCD > 0 || !S.running) return;
+  S.shootCD = .8;
+  S.recoil = 2.2;
+  gun.userData.muzzle.intensity = 14;
+  sfx.boom();
+  const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+  for (let i = 0; i < 7; i++) {
+    const m = new THREE.Mesh(bulletGeo, bulletMat);
+    m.scale.setScalar(.8);
+    m.position.copy(P.pos).addScaledVector(dir, 1.4);
+    const spread = new THREE.Vector3((Math.random() - .5) * .35, (Math.random() - .5) * .25, (Math.random() - .5) * .35);
+    const v = dir.clone().add(spread).normalize().multiplyScalar(48);
+    scene.add(m);
+    bullets.push({ m, vel: v, life: .9 });
+  }
+}
+
+const fbGeo = new THREE.IcosahedronGeometry(.3, 0);
+const fbMat = new THREE.MeshLambertMaterial({ color: 0xff3b30, emissive: 0x8b0000, flatShading: true });
+function dragonFire(from, spread = 0, speed = 14) {
+  const m = new THREE.Mesh(fbGeo, fbMat);
+  m.position.copy(from);
+  scene.add(m);
+  const vel = P.pos.clone().sub(from).normalize();
+  if (spread) vel.applyAxisAngle(UP, spread);
+  vel.multiplyScalar(speed);
+  fireballs.push({ m, vel, life: 4 });
+  sfx.fireball();
+}
+
+addEventListener('mousedown', e => {
+  if (!S.running || !document.pointerLockElement) return;
+  if (e.button === 2) shotgun(); else shoot();
+});
+addEventListener('contextmenu', e => e.preventDefault());
+addEventListener('mousemove', e => {
+  if (!document.pointerLockElement || !S.running) return;
+  P.yaw -= e.movementX * .0022;
+  P.pitch = Math.max(-1.4, Math.min(1.4, P.pitch - e.movementY * .0022));
+});
+renderer.domElement.addEventListener('click', () => {
+  if (S.running && !document.pointerLockElement) lockPointer();
+});
+
+/* ============================== BOUCLE ============================== */
+const clock = new THREE.Clock();
+const tmpV = new THREE.Vector3();
+const tmpV2 = new THREE.Vector3();
+const UP = new THREE.Vector3(0, 1, 0);
+let bobT = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  const rawDt = Math.min(clock.getDelta(), .05);
+  const dt = rawDt * (S.slowmo > 0 ? .25 : 1); // slow-mo au kill de boss
+  const t = clock.elapsedTime;
+
+  for (const c of clouds) {
+    c.g.position.x += c.s * dt;
+    if (c.g.position.x > 90) c.g.position.x = -90;
+  }
+  // flammes des torches qui dansent
+  for (const tch of mapAssets) {
+    const f = tch.userData.flame;
+    if (f) { const s = .9 + Math.sin(t * 9 + tch.position.x) * .2; f.scale.set(s, 1 + Math.sin(t * 12 + tch.position.z) * .25, s); }
+  }
+  // slow-mo = ambiance dramatique
+  const sl = S.slowmo > 0;
+  bloom.strength = sl ? .7 : .35;
+  for (let i = 0; i < PMAX; i++) {
+    if (pLife[i] <= 0) { pPos[i*3+1] = -999; continue; }
+    pLife[i] -= dt * 1.6;
+    pVel[i*3+1] -= dt * 4;
+    pPos[i*3] += pVel[i*3] * dt; pPos[i*3+1] += pVel[i*3+1] * dt; pPos[i*3+2] += pVel[i*3+2] * dt;
+  }
+  pGeo.attributes.position.needsUpdate = true;
+
+  if (S.running) {
+    S.slowmo -= rawDt;
+    const waveMul = 1 + (S.wave - 1) * .15;
+
+    // ---- mouvement joueur ----
+    tmpV.set(0, 0, 0);
+    if (keys.KeyW || keys.ArrowUp) tmpV.z -= 1;
+    if (keys.KeyS || keys.ArrowDown) tmpV.z += 1;
+    if (keys.KeyA || keys.ArrowLeft) tmpV.x -= 1;
+    if (keys.KeyD || keys.ArrowRight) tmpV.x += 1;
+    if (tmpV.lengthSq() > 0) {
+      tmpV.normalize().applyAxisAngle(new THREE.Vector3(0, 1, 0), P.yaw);
+      bobT += dt * 10;
+    }
+    P.vel.lerp(tmpV.multiplyScalar(9), 1 - Math.pow(.0001, dt));
+    P.pos.x += P.vel.x * dt;
+    P.pos.z += P.vel.z * dt;
+    const d = Math.hypot(P.pos.x, P.pos.z);
+    if (d > ARENA_R) { P.pos.x *= ARENA_R / d; P.pos.z *= ARENA_R / d; }
+
+    // saut + gravité
+    if (keys.Space && P.grounded) { P.vy = 7; P.grounded = false; }
+    P.vy -= 20 * dt;
+    P.pos.y += P.vy * dt;
+    if (P.pos.y <= 1.7) { P.pos.y = 1.7; P.vy = 0; P.grounded = true; }
+
+    P.invuln -= dt;
+    S.shootCD -= dt;
+
+    // caméra + bob + recul
+    S.recoil = Math.max(0, S.recoil - dt * 6);
+    camera.position.copy(P.pos);
+    camera.position.y += Math.abs(Math.sin(bobT)) * .08;
+    camera.rotation.set(P.pitch + S.recoil * .05, P.yaw, 0);
+    gun.position.z = -.7 + S.recoil * .12;
+    gun.rotation.x = S.recoil * .3;
+    gun.userData.muzzle.intensity *= .7;
+
+    // ---- tirs joueur ----
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      const b = bullets[i];
+      b.m.position.addScaledVector(b.vel, dt);
+      b.life -= dt;
+      if ((t * 30 | 0) % 2 === 0) emit(b.m.position, 1, .05, .3);
+      let dead = b.life <= 0;
+      for (let j = enemies.length - 1; j >= 0 && !dead; j--) {
+        const e = enemies[j];
+        tmpV2.copy(e.g.position); tmpV2.y += e.type === 'turtle' ? .8 : e.type === 'boss' ? 4 : 1.5;
+        if (b.m.position.distanceTo(tmpV2) < STATS[e.type].hitR) {
+          dead = true;
+          e.hp--;
+          emit(tmpV2, 12, .8, 2);
+          if (e.hp <= 0) {
+            emit(tmpV2, 30, 1.2, 4);
+            scene.remove(e.g);
+            enemies.splice(j, 1);
+            S.score += STATS[e.type].score * S.wave;
+            sfx.boom();
+            if (e.type === 'boss') { S.slowmo = 1.2; killPop('👑 BOSS VAINCU ! +' + STATS.boss.score * S.wave); }
+            else killPop('+' + STATS[e.type].score * S.wave + ' 💥');
+            if (Math.random() < .25 && P.hearts < 3) { P.hearts++; sfx.heal(); killPop('❤️ SOIN !'); }
+            updateHUD();
+            if (enemies.length === 0 && S.pending === 0) {
+              S.score += 25 * S.wave;
+              killPop('✨ VAGUE ' + S.wave + ' CLEAR ! +' + 25 * S.wave);
+              S.wave++;
+              startWave();
+            }
+          } else {
+            beep(300, .08, 'square', .1);
+            if (e.hp < e.maxHp && e.type !== 'boss' && !e.weakHint) { e.weakHint = true; killPop('🎯 Affaibli ! Appuie sur C !'); }
+          }
+        }
+      }
+      if (bonusPhoenix && !dead) {
+        if (b.m.position.distanceTo(bonusPhoenix.g.position) < 2) {
+          dead = true;
+          S.score += 100 * S.wave;
+          P.hearts = 3;
+          S.orbs += 3;
+          sfx.heal(); sfx.boom();
+          killPop('🔥 PHÉNIX ! +' + 100 * S.wave + ' · VIE MAX · +3 ORBES !');
+          emit(bonusPhoenix.g.position, 50, 2, 5);
+          scene.remove(bonusPhoenix.g);
+          bonusPhoenix = null;
+          updateHUD();
+        }
+      }
+      if (dead) { scene.remove(b.m); bullets.splice(i, 1); }
+    }
+
+    // ---- IA ennemis ----
+    for (const e of enemies) {
+      e.t -= dt;
+      if (e.g.userData.mixer) e.g.userData.mixer.update(dt);
+      // rebond cartoon sur les modèles sans animation intégrée
+      if (e.g.userData.animMesh && !e.g.userData.mixer) {
+        const am = e.g.userData.animMesh;
+        am.position.y = (am.userData.baseY ??= am.position.y) + Math.abs(Math.sin(t * 8 + e.g.position.x)) * .12;
+        am.rotation.z = Math.sin(t * 8 + e.g.position.x) * .06;
+      }
+      const st = STATS[e.type];
+      if (e.type === 'turtle') {
+        tmpV.copy(P.pos).setY(0).sub(e.g.position).normalize();
+        e.g.position.addScaledVector(tmpV, st.speed * waveMul * dt);
+        e.g.lookAt(P.pos.x, 0, P.pos.z);
+      } else if (e.type === 'elephant') {
+        if (e.state === 'roam') {
+          tmpV.copy(P.pos).setY(0).sub(e.g.position).normalize();
+          e.g.position.addScaledVector(tmpV, st.speed * waveMul * dt);
+          e.g.lookAt(P.pos.x, 0, P.pos.z);
+          if (e.t <= 0) { e.state = 'aim'; e.t = .7; }
+        } else if (e.state === 'aim') {
+          e.g.lookAt(P.pos.x, 0, P.pos.z);
+          e.g.position.y = Math.abs(Math.sin(t * 25)) * .15;
+          if (e.t <= 0) { e.state = 'charge'; e.t = 1; e.dir.copy(P.pos).setY(0).sub(e.g.position).normalize(); }
+        } else {
+          e.g.position.y = 0;
+          e.g.position.addScaledVector(e.dir, 16 * waveMul * dt);
+          if (e.t <= 0) { e.state = 'roam'; e.t = 1.5 + Math.random() * 2; }
+        }
+      } else { // dragon & boss
+        const isBoss = e.type === 'boss';
+        tmpV.copy(P.pos); tmpV.y = (isBoss ? 9 : 5) + Math.sin(t * 2) * 1.5;
+        tmpV2.copy(tmpV).sub(e.g.position);
+        const dist = tmpV2.length();
+        tmpV2.normalize();
+        e.g.position.addScaledVector(tmpV2, Math.min(st.speed * waveMul, dist) * dt * (dist > 10 ? 1.6 : .6));
+        e.g.lookAt(P.pos);
+        e.shootT -= dt;
+        if (e.shootT <= 0 && dist < (isBoss ? 50 : 30)) {
+          e.shootT = Math.max(1.2, 2.8 - S.wave * .15) * (isBoss ? .75 : 1);
+          if (isBoss) {
+            dragonFire(e.g.position, -.2, 16); dragonFire(e.g.position, 0, 16); dragonFire(e.g.position, .2, 16);
+          } else {
+            dragonFire(e.g.position, 0, 14);
+          }
+        }
+      }
+      const ed = Math.hypot(e.g.position.x, e.g.position.z);
+      if (ed > ARENA_R + 2) { e.g.position.x *= (ARENA_R + 2) / ed; e.g.position.z *= (ARENA_R + 2) / ed; }
+
+      // mêlée : 3D pour les volants, horizontale pour les au sol
+      if (e.type === 'dragon' || e.type === 'boss') {
+        if (e.g.position.distanceTo(P.pos) < st.hitR) damagePlayer();
+      } else {
+        if (Math.hypot(e.g.position.x - P.pos.x, e.g.position.z - P.pos.z) < st.hitR * .8 && P.pos.y < 3.2) damagePlayer();
+      }
+      // feedback "capturable" : clignote blanc/vert
+      e.g.traverse(o => {
+        if (o.isMesh && !o.userData.baseEmissive) o.userData.baseEmissive = o.material.emissive ? o.material.emissive.clone() : new THREE.Color(0);
+      });
+      const capturable = e.hp < e.maxHp && e.type !== 'boss';
+      const flash = capturable ? (Math.sin(t * 10) > 0 ? .5 : 0) : 0;
+      e.g.traverse(o => {
+        if (o.isMesh && o.material.emissive) o.material.emissive.setRGB(flash * .4, flash, flash * .4).add(o.userData.baseEmissive || new THREE.Color(0));
+      });
+    }
+
+    // ---- orbes de capture en vol ----
+    for (let i = teamBalls.length - 1; i >= 0; i--) {
+      const b = teamBalls[i];
+      b.m.position.addScaledVector(b.vel, dt);
+      b.m.rotation.x += dt * 12;
+      b.spin += dt;
+      emit(b.m.position, 1, .1, .3);
+      tmpV.copy(b.target.g.position); tmpV.y += 1;
+      if (b.m.position.distanceTo(tmpV) < 1.6 || b.spin > 3) {
+        scene.remove(b.m);
+        teamBalls.splice(i, 1);
+        if (b.spin <= 3 && enemies.includes(b.target)) {
+          emit(tmpV, 40, 1.5, 3);
+          capture(b.target);
+        }
+      }
+    }
+
+    // ---- équipe capturée : te suit et attaque les ennemis ----
+    for (const m of team) {
+      m.followA += dt * .5;
+      const slot = team.indexOf(m);
+      const a = m.followA + slot * 2.2;
+      tmpV.set(P.pos.x + Math.cos(a) * 4, m.g.position.y, P.pos.z + Math.sin(a) * 4);
+      m.g.position.lerp(tmpV, dt * 2);
+      m.atkT -= dt;
+      if (m.atkT <= 0 && enemies.length) {
+        // attaque l'ennemi le plus proche
+        let best = null, bd = 1e9;
+        for (const e of enemies) {
+          const d = e.g.position.distanceTo(m.g.position);
+          if (d < bd) { bd = d; best = e; }
+        }
+        if (best && bd < 18) {
+          m.atkT = 1.2;
+          m.g.lookAt(best.g.position.x, m.g.position.y, best.g.position.z);
+          tmpV.copy(best.g.position); tmpV.y += 1;
+          emit(tmpV, 10, .6, 2);
+          best.hp--;
+          beep(500, .06, 'sine', .06);
+          if (best.hp <= 0) {
+            const idx = enemies.indexOf(best);
+            if (idx >= 0) {
+              emit(tmpV, 25, 1, 3);
+              scene.remove(best.g);
+              enemies.splice(idx, 1);
+              S.score += STATS[best.type].score * S.wave;
+              sfx.boom();
+              killPop('🤜 ' + (TEAM_EMOJI[m.type] || '⭐') + ' +' + STATS[best.type].score * S.wave);
+              if (best.type === 'boss') S.slowmo = 1.2;
+              updateHUD();
+              if (enemies.length === 0 && S.pending === 0) { S.score += 25 * S.wave; killPop('✨ VAGUE ' + S.wave + ' CLEAR !'); S.wave++; startWave(); }
+            }
+          }
+          updateHUD();
+        }
+      }
+    }
+
+    // ---- boules de feu du dragon ----
+    for (let i = fireballs.length - 1; i >= 0; i--) {
+      const f = fireballs[i];
+      f.m.position.addScaledVector(f.vel, dt);
+      f.life -= dt;
+      emit(f.m.position, 1, .1, .3);
+      let dead = f.life <= 0 || f.m.position.y < 0;
+      if (f.m.position.distanceTo(P.pos) < 1.2) { dead = true; damagePlayer(); }
+      if (dead) { emit(f.m.position, 8, .4, 1.5); scene.remove(f.m); fireballs.splice(i, 1); }
+    }
+
+    // ---- phénix bonus ----
+    S.phoenixT -= dt;
+    if (!bonusPhoenix && S.phoenixT <= 0) {
+      S.phoenixT = 20 + Math.random() * 10;
+      const g = makePhoenix();
+      const a = Math.random() * Math.PI * 2;
+      g.position.set(Math.cos(a) * ARENA_R, 6 + Math.random() * 4, Math.sin(a) * ARENA_R);
+      scene.add(g);
+      bonusPhoenix = { g, a, r: ARENA_R, t: 0 };
+      killPop('🔥 UN PHÉNIX APPARAÎT !');
+    }
+    if (bonusPhoenix) {
+      if (bonusPhoenix.g.userData.mixer) bonusPhoenix.g.userData.mixer.update(dt);
+      bonusPhoenix.t += dt;
+      bonusPhoenix.a += dt * .8;
+      bonusPhoenix.r -= dt * 2.2;
+      const bp = bonusPhoenix;
+      bp.g.position.set(Math.cos(bp.a) * bp.r, 6 + Math.sin(bp.t * 3) * 1.5, Math.sin(bp.a) * bp.r);
+      bp.g.rotation.y = -bp.a;
+      if (bp.r < 4) { scene.remove(bp.g); bonusPhoenix = null; }
+    }
+
+    // barre de vie du boss
+    const boss = enemies.find(e => e.type === 'boss');
+    $('boss-wrap').style.display = boss ? 'block' : 'none';
+    if (boss) $('boss-fill').style.width = Math.max(0, boss.hp / boss.maxHp * 100) + '%';
+  }
+
+  composer.render();
+}
+
+/* ============================== UI ============================== */
+function lockPointer() {
+  try { const p = renderer.domElement.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+}
+$('start-btn').onclick = () => {
+  $('title-screen').style.display = 'none';
+  resetGame();
+  S.running = true;
+  lockPointer();
+  clock.getDelta();
+};
+$('restart-btn').onclick = () => {
+  $('gameover-screen').style.display = 'none';
+  resetGame();
+  S.running = true;
+  lockPointer();
+};
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+});
+
+buildEpicMap(); // torches, ruines, statues, fleurs, champignons, cristaux
+animate();
+</script>
+</body>
+</html>
