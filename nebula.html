@@ -281,93 +281,104 @@
     border-top-color: #c55aff; border-right-color: #40f0ff; animation: fxspin 1s linear infinite; }
   @keyframes fxspin { to { transform: rotate(360deg); } }
   /* ===== ARÈNE PLEIN ÉCRAN (design Legendary Species) ===== */
-  #arena-war { position: fixed; inset: 0; z-index: 30; display: none; overflow-y: auto;
-    background: radial-gradient(ellipse at 50% 115%, rgba(197, 90, 255, .22), transparent 55%),
-                radial-gradient(ellipse at 50% -15%, rgba(64, 240, 255, .12), transparent 50%),
-                radial-gradient(ellipse at 50% 45%, #2a0f47 0%, #0d0320 70%, #050110 100%); }
-  #arena-war::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .5;
-    background-image: radial-gradient(1px 1px at 12% 18%, #e9b8ff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 68% 8%, #8fe9ff 50%, transparent 51%),
-      radial-gradient(1px 1px at 85% 30%, #ffd9f2 50%, transparent 51%), radial-gradient(1px 1px at 30% 70%, #c55aff 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 55% 55%, #7dff8a 50%, transparent 51%), radial-gradient(1px 1px at 90% 80%, #8fe9ff 50%, transparent 51%),
-      radial-gradient(1px 1px at 5% 55%, #ffd9f2 50%, transparent 51%), radial-gradient(1.5px 1.5px at 40% 30%, #e9b8ff 50%, transparent 51%); }
+  #arena-war { position: fixed; inset: 0; z-index: 30; display: none; overflow-y: auto; color: #00ff41;
+    background: radial-gradient(ellipse at 50% 118%, rgba(0, 255, 65, .14), transparent 46%),
+                radial-gradient(ellipse at 50% -8%, rgba(0, 80, 24, .35), transparent 42%),
+                linear-gradient(180deg, #04140a 0%, #000 38%, #000 100%); }
+  #arena-war::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .55;
+    background-image: repeating-linear-gradient(0deg, rgba(0, 255, 65, .045) 0 1px, transparent 1px 3px),
+      radial-gradient(1px 1px at 12% 18%, #00ff41 50%, transparent 51%), radial-gradient(1.5px 1.5px at 68% 8%, #b6ffc9 50%, transparent 51%),
+      radial-gradient(1px 1px at 85% 30%, #00cc33 50%, transparent 51%), radial-gradient(1px 1px at 30% 70%, #00330f 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 55% 55%, #00ff41 50%, transparent 51%), radial-gradient(1px 1px at 90% 80%, #0a0 50%, transparent 51%); }
   #arena-war::after { content: ''; position: fixed; left: 8%; right: 8%; bottom: 4%; height: 34%; pointer-events: none;
-    background: repeating-radial-gradient(ellipse at 50% 130%, rgba(197, 90, 255, .10) 0 2px, transparent 2px 64px);
-    border-bottom: 2px solid rgba(197, 90, 255, .35); border-radius: 0 0 50% 50%; filter: blur(.4px); }
+    background: repeating-radial-gradient(ellipse at 50% 130%, #000 0 3px, transparent 3px 62px);
+    border-bottom: 2px solid rgba(0, 255, 65, .28); border-radius: 0 0 50% 50%; }
+  #arena-war.aw-shake { animation: awShake .42s linear; }
+  @keyframes awShake { 0%, 100% { transform: none; } 18% { transform: translate(-9px, 5px); } 36% { transform: translate(8px, -6px); } 54% { transform: translate(-5px, 3px); } 72% { transform: translate(3px, 2px); } }
+  .aw-boom { position: fixed; left: 50%; top: 42%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; pointer-events: none; z-index: 8;
+    background: radial-gradient(circle, rgba(230, 255, 210, .95) 0%, rgba(0, 255, 65, .55) 22%, rgba(0, 0, 0, .15) 48%, transparent 70%);
+    box-shadow: 0 0 40px rgba(0, 255, 65, .65); animation: awBoom .48s ease-out forwards; }
+  @keyframes awBoom { 0% { transform: scale(.15); opacity: 1; } 100% { transform: scale(2.8); opacity: 0; } }
   .aw-panel { position: relative; width: min(1180px, 97vw); margin: 0 auto; padding: 14px 22px 22px; z-index: 1; }
-  .aw-head { display: flex; justify-content: space-between; align-items: center; font-family: 'Bangers', cursive; font-size: 26px; letter-spacing: 2px; color: #ffb8e6; text-shadow: 0 0 12px rgba(255, 45, 120, .6); }
-  #aw-close { background: none; border: 1px solid #c55aff; color: #e9b8ff; border-radius: 8px; font-size: 18px; padding: 2px 10px; cursor: pointer; }
+  .aw-head { display: flex; justify-content: space-between; align-items: center; font-family: 'Courier New', monospace; font-size: 22px; letter-spacing: 3px; color: #00ff41; text-shadow: 0 0 12px rgba(0, 255, 65, .75); }
+  #aw-close { background: #000; border: 1px solid #00ff41; color: #00ff41; border-radius: 2px; font-size: 18px; padding: 2px 10px; cursor: pointer; }
   /* --- carte rectangulaire détaillée (ratio ~3:4 façon LS) --- */
-  .awc { width: 118px; padding: 6px; border-radius: 12px; text-align: center; position: relative;
-    background: linear-gradient(165deg, #2c1740, #0a0512 70%); border: 2px solid var(--sc, #c55aff); box-shadow: 0 4px 14px rgba(0,0,0,.55); }
-  .awc-art { height: 86px; border-radius: 8px; background-size: cover; background-position: center top; border: 1px solid rgba(255,255,255,.12); }
-  .awc-n { font-size: 11px; font-weight: 600; color: #f2e6ff; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .awc-sp { font-size: 9px; color: #a990c9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .awc-s { font-family: 'Bangers', cursive; font-size: 19px; color: #ffd36b; text-shadow: 0 0 10px rgba(255, 211, 107, .6); margin-top: 1px; }
-  .awc-s small { font-family: 'Poppins', sans-serif; font-size: 10px; color: #ff9ac8; text-shadow: none; }
-  .awc.fx1 { border-style: double; box-shadow: 0 0 12px rgba(197, 90, 255, .5); }
-  .awc.fx2 { border-color: #ffd36b; box-shadow: 0 0 14px rgba(255, 211, 107, .55), inset 0 0 14px rgba(255, 211, 107, .12); animation: awGlow 3s ease-in-out infinite alternate; }
-  .awc.fx3 { border-color: #40f0ff; box-shadow: 0 0 18px rgba(64, 240, 255, .6), inset 0 0 18px rgba(64, 240, 255, .14); animation: awGlow 2.2s ease-in-out infinite alternate; }
+  .awc { width: 118px; padding: 6px; border-radius: 4px; text-align: center; position: relative;
+    background: linear-gradient(165deg, #0a1a0e, #000 72%); border: 2px solid #00ff41; box-shadow: 0 4px 14px rgba(0,0,0,.7), inset 0 0 12px rgba(0, 255, 65, .08); }
+  .awc-art { height: 86px; border-radius: 2px; background-size: cover; background-position: center top; border: 1px solid rgba(0, 255, 65, .28); }
+  .awc-n { font-size: 11px; font-weight: 600; color: #d8ffe4; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .awc-sp { font-size: 9px; color: #5dcc78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .awc-s { font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: #00ff41; text-shadow: 0 0 8px rgba(0, 255, 65, .7); margin-top: 1px; }
+  .awc-s small { font-family: 'Courier New', monospace; font-size: 11px; color: #9dffb4; text-shadow: none; }
+  .awc.fx1 { border-style: double; border-color: #00cc33; box-shadow: 0 0 12px rgba(0, 255, 65, .45); }
+  .awc.fx2 { border-color: #b6ff6a; box-shadow: 0 0 14px rgba(182, 255, 106, .55), inset 0 0 14px rgba(0, 255, 65, .12); animation: awGlow 3s ease-in-out infinite alternate; }
+  .awc.fx3 { border-color: #eaffea; box-shadow: 0 0 18px rgba(0, 255, 65, .75), inset 0 0 18px rgba(0, 255, 65, .16); animation: awGlow 2.2s ease-in-out infinite alternate; }
   @keyframes awGlow { from { filter: brightness(1); } to { filter: brightness(1.18); } }
   .awc.hand { cursor: pointer; transition: transform .12s, box-shadow .12s; }
-  .awc.hand:hover { transform: translateY(-10px) scale(1.08); box-shadow: 0 10px 22px rgba(197, 90, 255, .55); z-index: 5; }
+  .awc.hand:hover { transform: translateY(-10px) scale(1.08); box-shadow: 0 10px 22px rgba(0, 255, 65, .55); z-index: 5; }
   .awc.duel { width: 190px; }
   .awc.duel .awc-art { height: 152px; }
   .awc.duel .awc-n { font-size: 14px; }
   .awc.duel .awc-sp { font-size: 11px; }
   .awc.duel .awc-s { font-size: 26px; }
   .awc.back { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 190px; height: 266px;
-    background: repeating-linear-gradient(45deg, #1c0f2e, #1c0f2e 9px, #150a24 9px, #150a24 18px); border: 2px solid #c55aff;
-    font-size: 58px; color: #c55aff; text-shadow: 0 0 18px rgba(197, 90, 255, .8); }
-  .awc.back small { font-size: 11px; color: #a990c9; letter-spacing: 2px; text-shadow: none; }
-  /* --- animations de duel --- */
-  .aw-flip { animation: awFlip .55s ease; }
-  @keyframes awFlip { 0% { transform: perspective(700px) rotateY(90deg) scale(.94); } 100% { transform: perspective(700px) rotateY(0deg) scale(1); } }
-  .aw-drop { animation: awDrop .4s ease; }
-  @keyframes awDrop { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .awc.win { border-color: #7dff8a; box-shadow: 0 0 26px rgba(125, 255, 138, .75); animation: awWin .5s ease; }
-  @keyframes awWin { 30% { transform: scale(1.06); } }
-  .awc.lose { animation: awBurn .8s ease forwards; }
-  @keyframes awBurn { 15% { filter: brightness(1.6) saturate(1.8); transform: rotate(2deg) scale(1.04); } 60% { filter: brightness(.7) sepia(.6); transform: rotate(-2deg) scale(.96); } 100% { filter: brightness(.35) grayscale(.85); transform: scale(.9); opacity: .45; } }
+    background: repeating-linear-gradient(45deg, #000, #000 8px, #031208 8px, #031208 16px); border: 2px solid #00ff41;
+    font-size: 58px; color: #00ff41; text-shadow: 0 0 18px rgba(0, 255, 65, .8); }
+  .awc.back small { font-size: 11px; color: #5dcc78; letter-spacing: 2px; text-shadow: none; }
+  /* --- animations de duel : swipe LS + impact --- */
+  .aw-swipe { animation: awSwipe .46s cubic-bezier(.2, .8, .2, 1); }
+  @keyframes awSwipe { 0% { transform: translate(-70px, 130px) rotate(-16deg) scale(.62); opacity: 0; } 58% { transform: translate(10px, -10px) rotate(3deg) scale(1.1); opacity: 1; } 100% { transform: none; opacity: 1; } }
+  .aw-reveal { animation: awReveal .5s cubic-bezier(.15, .7, .2, 1); }
+  @keyframes awReveal { 0% { transform: perspective(900px) translate(90px, -120px) rotateY(88deg) rotateZ(14deg) scale(.6); opacity: 0; } 62% { transform: perspective(900px) translate(-8px, 6px) rotateY(-6deg) scale(1.08); opacity: 1; } 100% { transform: none; opacity: 1; } }
+  .aw-reveal.win { animation: awReveal .42s cubic-bezier(.15, .7, .2, 1), awSlam .5s ease .38s; }
+  .aw-reveal.lose { animation: awReveal .42s cubic-bezier(.15, .7, .2, 1), awBurn 1s ease .4s forwards; }
+  .awc.win { border-color: #eaffea; box-shadow: 0 0 28px rgba(0, 255, 65, .9); }
+  @keyframes awSlam { 0% { transform: scale(1); } 20% { transform: scale(1.2) rotate(-3deg); filter: brightness(1.7); } 42% { transform: scale(.94) rotate(2deg); } 100% { transform: scale(1); filter: none; } }
+  .awc.lose { animation: awBurn 1s ease forwards; }
+  @keyframes awBurn { 0% { filter: brightness(1); transform: scale(1); } 12% { filter: brightness(2.2) saturate(1.6); transform: scale(1.12) rotate(4deg); } 35% { filter: brightness(.55) sepia(.8) hue-rotate(70deg); transform: rotate(-6deg) scale(.9); } 100% { filter: brightness(.12) grayscale(1); transform: scale(.55) rotate(8deg); opacity: .2; } }
   .awc.tie2 { animation: awTie .7s ease forwards; }
   @keyframes awTie { to { filter: grayscale(.7) brightness(.5); opacity: .4; transform: scale(.93); } }
-  .aw-pop { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%); z-index: 6; pointer-events: none;
-    font-family: 'Bangers', cursive; font-size: 54px; color: #7dff8a; text-shadow: 0 0 24px rgba(125, 255, 138, .9), 0 4px 0 rgba(0,0,0,.4);
+  .aw-pop { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%); z-index: 9; pointer-events: none;
+    font-family: 'Courier New', monospace; font-weight: 700; font-size: 64px; color: #00ff41; text-shadow: 0 0 24px rgba(0, 255, 65, .95), 0 4px 0 #000;
     animation: awPop 1.4s ease forwards; }
-  .aw-pop.red { color: #ff6a8a; text-shadow: 0 0 24px rgba(255, 45, 120, .9), 0 4px 0 rgba(0,0,0,.4); }
-  .aw-pop.grey { color: #c9b3e6; text-shadow: 0 0 18px rgba(197, 90, 255, .8); }
+  .aw-pop.red { color: #ff4d4d; text-shadow: 0 0 24px rgba(255, 40, 40, .9), 0 4px 0 #000; }
+  .aw-pop.grey { color: #8aa898; text-shadow: 0 0 18px rgba(0, 255, 65, .4); }
   @keyframes awPop { 0% { transform: translate(-50%, -50%) scale(.4); opacity: 0; } 18% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } 75% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
   /* --- écran de chargement d'arène --- */
   #aw-loading { position: fixed; inset: 0; z-index: 31; display: none; flex-direction: column; align-items: center; justify-content: center;
-    background: radial-gradient(ellipse at 50% 40%, #3a1360 0%, #0d0320 75%); }
-  #aw-loading .aw-load-title { font-family: 'Bangers', cursive; font-size: 46px; letter-spacing: 4px; color: #ffb8e6; text-shadow: 0 0 26px rgba(255, 45, 120, .8); animation: awPulse 1.2s ease-in-out infinite alternate; }
+    background: radial-gradient(ellipse at 50% 40%, #062010 0%, #000 72%); }
+  #aw-loading .aw-load-title { font-family: 'Courier New', monospace; font-size: 40px; letter-spacing: 6px; color: #00ff41; text-shadow: 0 0 26px rgba(0, 255, 65, .85); animation: awPulse 1.2s ease-in-out infinite alternate; }
   @keyframes awPulse { from { transform: scale(1); } to { transform: scale(1.06); } }
-  #aw-loading .aw-load-sub { margin-top: 10px; font-size: 14px; color: #d9c2ff; }
-  #aw-loading .aw-load-bar { width: min(420px, 80vw); height: 8px; margin-top: 26px; border-radius: 5px; background: rgba(0,0,0,.5); overflow: hidden; border: 1px solid rgba(197, 90, 255, .4); }
-  #aw-loading .aw-load-bar div { height: 100%; width: 0; background: linear-gradient(90deg, #c55aff, #ff2d78, #40f0ff); box-shadow: 0 0 14px rgba(197, 90, 255, .8); transition: width .35s ease; }
+  #aw-loading .aw-load-sub { margin-top: 10px; font-size: 14px; color: #8dffb0; font-family: 'Courier New', monospace; }
+  #aw-loading .aw-load-bar { width: min(420px, 80vw); height: 8px; margin-top: 26px; border-radius: 0; background: #000; overflow: hidden; border: 1px solid rgba(0, 255, 65, .55); }
+  #aw-loading .aw-load-bar div { height: 100%; width: 0; background: linear-gradient(90deg, #00330f, #00ff41); box-shadow: 0 0 14px rgba(0, 255, 65, .8); transition: width .35s ease; }
   /* sélection du deck de 20 */
-  #aw-sel-count { text-align: center; font-size: 15px; color: #d9c2ff; margin: 10px 0 12px; }
+  #aw-sel-count { text-align: center; font-size: 15px; color: #8dffb0; margin: 10px 0 12px; font-family: 'Courier New', monospace; }
   #aw-sel-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-height: 58vh; overflow-y: auto; padding: 6px; }
   #aw-sel-grid .awc { cursor: pointer; transition: transform .1s; }
   #aw-sel-grid .awc:hover { transform: scale(1.06); }
-  .awc.sel2 { box-shadow: 0 0 16px rgba(125, 255, 138, .7); border-color: #7dff8a; }
-  .awc.sel2::after { content: '✓'; position: absolute; top: 4px; left: 6px; color: #7dff8a; font-weight: 900; text-shadow: 0 0 8px #0f0; }
+  .awc.sel2 { box-shadow: 0 0 16px rgba(0, 255, 65, .75); border-color: #00ff41; }
+  .awc.sel2::after { content: '✓'; position: absolute; top: 4px; left: 6px; color: #00ff41; font-weight: 900; text-shadow: 0 0 8px #00ff41; }
   .awc.off { opacity: .35; filter: grayscale(.7); }
   #aw-fight { display: block; margin: 16px auto 4px; min-width: 260px; }
   #aw-fight:disabled, #aw-online:disabled { opacity: .4; cursor: not-allowed; }
   /* duel */
   .aw-scores { display: flex; justify-content: space-between; align-items: center; max-width: 760px; margin: 6px auto 12px;
-    font-size: 16px; color: #e9b8ff; }
-  .aw-scores b { font-family: 'Bangers', cursive; font-size: 38px; color: #fff; margin-left: 10px; text-shadow: 0 0 14px rgba(197, 90, 255, .8); }
-  #aw-round { font-family: 'Bangers', cursive; font-size: 20px; letter-spacing: 3px; color: #8fe9ff; text-shadow: 0 0 12px rgba(143, 233, 255, .6); }
+    font-size: 15px; color: #8dffb0; font-family: 'Courier New', monospace; }
+  .aw-scores b { font-family: 'Courier New', monospace; font-size: 36px; color: #00ff41; margin-left: 10px; text-shadow: 0 0 14px rgba(0, 255, 65, .85); }
+  #aw-round { font-family: 'Courier New', monospace; font-size: 16px; letter-spacing: 3px; color: #b6ffc9; text-shadow: 0 0 12px rgba(0, 255, 65, .55); }
   .aw-arena-row { display: flex; align-items: center; justify-content: center; gap: 44px; min-height: 280px; margin: 4px 0 8px; }
-  .aw-vs { font-family: 'Bangers', cursive; font-size: 52px; color: #ff2d78; text-shadow: 0 0 24px rgba(255, 45, 120, .9); animation: awPulse 1.6s ease-in-out infinite alternate; }
-  .aw-q { font-size: 60px; color: rgba(197, 90, 255, .4); display: flex; align-items: center; justify-content: center; width: 190px; height: 266px;
-    border: 3px dashed rgba(197, 90, 255, .4); border-radius: 12px; background: rgba(0,0,0,.25); }
-  .aw-log { min-height: 44px; font-size: 14px; color: #c9b3e6; text-align: center; margin: 6px 0; line-height: 1.5; }
-  .aw-log b { color: #ffd36b; }
+  .aw-vs { font-family: 'Courier New', monospace; font-weight: 700; font-size: 42px; color: #00ff41; text-shadow: 0 0 24px rgba(0, 255, 65, .9); animation: awPulse 1.6s ease-in-out infinite alternate; }
+  .aw-q { font-size: 60px; color: rgba(0, 255, 65, .35); display: flex; align-items: center; justify-content: center; width: 190px; height: 266px;
+    border: 3px dashed rgba(0, 255, 65, .35); border-radius: 4px; background: #000; }
+  .aw-log { min-height: 44px; font-size: 14px; color: #7dcca0; text-align: center; margin: 6px 0; line-height: 1.5; font-family: 'Courier New', monospace; }
+  .aw-log b { color: #00ff41; }
   .aw-hand { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
-  .aw-hand-title { text-align: center; font-family: 'Bangers', cursive; letter-spacing: 2px; font-size: 15px; color: #8fe9ff; margin-top: 4px; }
-  .aw-rule { text-align: center; font-size: 12.5px; color: #a990c9; margin: 4px auto 8px; max-width: 900px; }
+  .aw-hand-title { text-align: center; font-family: 'Courier New', monospace; letter-spacing: 2px; font-size: 13px; color: #00ff41; margin-top: 4px; }
+  .aw-rule { text-align: center; font-size: 12.5px; color: #5dcc78; margin: 4px auto 8px; max-width: 900px; font-family: 'Courier New', monospace; }
+  #arena-war .btn, #arena-war .mbtn { color: #000; background: #00ff41; border: 1px solid #00ff41; border-radius: 2px; box-shadow: 0 0 16px rgba(0, 255, 65, .35); font-family: 'Courier New', monospace; }
+  #arena-war .btn:hover:not(:disabled), #arena-war .mbtn:hover:not(:disabled) { background: #b6ffc9; color: #000; }
+  #aw-online-st { color: #8dffb0 !important; }
   #menu { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 18px 0 10px; }
   .mbtn { font-family: 'Bangers', cursive; font-size: 22px; letter-spacing: 2px; min-width: 300px;
     color: #e9b8ff; background: rgba(15, 4, 32, .65); border: 1px solid rgba(197, 90, 255, .6);
@@ -1683,6 +1694,40 @@ function emitFire(pos, n, spread = .25, power = 1.2, up = .5) {
     fpLife[j] = .6 + Math.random() * .4;
   }
 }
+const _jet = new THREE.Vector3();
+function emitFlameJet(origin, dir, n = 10) { // lance de flammes : particules poussées DANS la direction du tir, pas une boule
+  _jet.copy(dir);
+  if (_jet.lengthSq() < 1e-6) return;
+  _jet.normalize();
+  for (let i = 0; i < n; i++) {
+    const j = fpHead = (fpHead + 1) % FMAXP;
+    const along = Math.random() * 2.8;
+    const rx = (Math.random() - .5) * .32, ry = (Math.random() - .5) * .22, rz = (Math.random() - .5) * .32;
+    fpPos[j*3] = origin.x + _jet.x * along + rx;
+    fpPos[j*3+1] = origin.y + _jet.y * along + ry;
+    fpPos[j*3+2] = origin.z + _jet.z * along + rz;
+    fpVel[j*3] = _jet.x * (4 + Math.random() * 5) + rx * 2;
+    fpVel[j*3+1] = _jet.y * 3.2 + .35 + Math.random() * .7;
+    fpVel[j*3+2] = _jet.z * (4 + Math.random() * 5) + rz * 2;
+    fpLife[j] = .22 + Math.random() * .32;
+  }
+}
+const flameLanceGeo = new THREE.ConeGeometry(.2, 2.9, 8);
+const flameCoreGeo = new THREE.ConeGeometry(.07, 3.2, 6);
+function makeFlameLance() { // cône de feu orienté vers la cible — pas une sphère
+  const g = new THREE.Group();
+  const outer = new THREE.Mesh(flameLanceGeo, new THREE.MeshBasicMaterial({ color: 0xff4a00, transparent: true, opacity: .9, depthWrite: false }));
+  const core = new THREE.Mesh(flameCoreGeo, new THREE.MeshBasicMaterial({ color: 0xfff4b0, transparent: true, opacity: .95, depthWrite: false }));
+  outer.rotation.x = Math.PI / 2; core.rotation.x = Math.PI / 2;
+  outer.position.z = -1.45; core.position.z = -1.6;
+  g.add(outer, core);
+  return g;
+}
+function aimLance(obj, vel) {
+  _jet.copy(obj.position).add(vel);
+  obj.lookAt(_jet);
+  if (obj.children[0]) obj.children[0].scale.set(0.75 + Math.random() * .5, 1, 0.85 + Math.random() * .35);
+}
 // fumée sombre (volcan + capsule)
 const SMAX = 260;
 const sGeo = new THREE.BufferGeometry();
@@ -1847,6 +1892,9 @@ const sfx = {
   hurt: () => { tone('sawtooth', 165, 70, .25, .25); noiz('lowpass', 700, 1, .22, .4); },
   fireball: pos => { noiz('bandpass', 600, 1, .45, .3, pos, 0, 1800); tone('sawtooth', 270, 90, .4, .1, pos); },
   swap: () => tone('sine', 1100, 1500, .07, .09),
+  arenaSwipe: () => { woosh(1.25, .9); tone('sawtooth', 520, 160, .14, .1); noiz('highpass', 2400, .6, .08, .16); },
+  arenaImpact: (mine) => { woosh(.62, 1); tone('sine', 96, 28, .42, .62); noiz('lowpass', 980, .7, .32, .5, null, 0, 70); tone('square', mine ? 740 : 180, mine ? 360 : 70, .18, .14); },
+  flame: pos => { noiz('lowpass', 420, .7, .7, .4, pos, 0, 90); noiz('bandpass', 1600, 1.4, .28, .22, pos); tone('sawtooth', 150, 48, .62, .18, pos); tone('triangle', 70, 36, .8, .1, pos, .04); },
   ui: () => { tone('sine', 880, 1320, .06, .1); tone('triangle', 1760, 1760, .05, .04, null, .03); },
   over: () => { tone('sawtooth', 220, 110, .45, .2); tone('sawtooth', 147, 60, .7, .2, null, .25); noiz('lowpass', 500, 1, 1.2, .3, null, .1, 80); },
   net: () => { woosh(1.6, .5); tone('triangle', 500, 1300, .15, .1); },
@@ -2304,33 +2352,30 @@ function shoot() {
   scene.add(m);
   bullets.push({ m, vel: dir.multiplyScalar(62), life: 1.4, dmg: blasterDmg(), owner: null });
 }
-const fireBoltMat = new THREE.MeshBasicMaterial({ color: 0xffa030 }); // souffle de dragon : boule incandescente (auto-lumineuse -> bloom)
-function allyShot(from, target, m) { // projectile d'un phénix/dragon allié — le dragon CRACHE DU FEU
+function allyShot(from, target, m) { // projectile d'un phénix/dragon allié — le dragon crache une LANCE DE FLAMMES
   const fire = m.c.sp === 'dragon';
-  const b = new THREE.Mesh(boltGeo, fire ? fireBoltMat : allyMat);
-  if (fire) b.scale.setScalar(1.5);
+  const b = fire ? makeFlameLance() : new THREE.Mesh(boltGeo, allyMat);
   b.position.copy(from); b.position.y += 1.2;
   tmpV2.copy(target.g.position); tmpV2.y += 1;
   scene.add(b);
-  if (fire) emitFire(b.position, 10, .3, 2, .8);
-  bullets.push({ m: b, vel: tmpV2.sub(b.position).normalize().multiplyScalar(fire ? 30 : 34), life: 1.6, dmg: SPECIES[m.c.sp].dmg / 5 * lvlMul(m.c.lvl), owner: m, fire });
+  const vel = tmpV2.sub(b.position).normalize().multiplyScalar(fire ? 22 : 34);
+  if (fire) { aimLance(b, vel); emitFlameJet(b.position, vel, 16); sfx.flame(b.position); }
+  bullets.push({ m: b, vel, life: 1.6, dmg: SPECIES[m.c.sp].dmg / 5 * lvlMul(m.c.lvl), owner: m, fire, lance: fire });
 }
 const fbGeo = new THREE.IcosahedronGeometry(.3, 0);
 const fbMat = new THREE.MeshLambertMaterial({ color: 0xff3b78, emissive: 0x8b0050, flatShading: true });
-const fbFireMat = new THREE.MeshBasicMaterial({ color: 0xff8c1e }); // dragon sauvage : vraie boule de feu
 function enemyFire(e, target, spread = 0, mult = 1) {
   const fire = e.sp === 'dragon';
-  const m = new THREE.Mesh(fbGeo, fire ? fbFireMat : fbMat);
-  if (fire) m.scale.setScalar(1.2);
-  m.position.copy(e.g.position); m.position.y += 1;
+  const m = fire ? makeFlameLance() : new THREE.Mesh(fbGeo, fbMat);
+  m.position.copy(e.g.position); m.position.y += fire ? 1.4 : 1;
   scene.add(m);
   const tp = target === P || !target ? P.pos : target.g.position;
   const vel = tp.clone().sub(m.position).normalize();
   if (spread) vel.applyAxisAngle(UP, spread);
-  vel.multiplyScalar(fire ? 20 : 16);
-  if (fire) emitFire(m.position, 10, .3, 2, .8);
-  fireballs.push({ m, vel, life: 4, dmg: SPECIES[e.sp].dmg * lvlMul(e.lvl) * .75 * mult, fire });
-  sfx.fireball(m.position);
+  vel.multiplyScalar(fire ? 16 : 16);
+  if (fire) { aimLance(m, vel); emitFlameJet(m.position, vel, 18); sfx.flame(m.position); }
+  else sfx.fireball(m.position);
+  fireballs.push({ m, vel, life: fire ? 2.6 : 4, dmg: SPECIES[e.sp].dmg * lvlMul(e.lvl) * .75 * mult, fire, lance: fire });
 }
 function hurtEnemy(e, dmg, owner) {
   if (!enemies.includes(e)) return;
