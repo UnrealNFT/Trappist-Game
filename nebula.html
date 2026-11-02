@@ -341,15 +341,17 @@
 .aw-scores { display: flex; justify-content: space-between; align-items: center; max-width: 760px; margin: 6px auto 12px; font-size: 16px; color: #e9b8ff; }
 .aw-scores b { font-family: 'Bangers', cursive; font-size: 38px; color: #fff; margin-left: 10px; text-shadow: 0 0 14px rgba(197, 90, 255, .7); }
 #aw-round { font-family: 'Bangers', cursive; font-size: 18px; letter-spacing: 2px; color: #ffb8e6; text-shadow: 0 0 12px rgba(197, 90, 255, .5); }
+.aw-arena-row { display: flex; align-items: center; justify-content: center; gap: 44px; min-height: 280px; margin: 4px 0 8px; }
 .aw-vs { font-family: 'Bangers', cursive; font-size: 42px; color: #e9b8ff; text-shadow: 0 0 20px rgba(197, 90, 255, .7); }
 .aw-q { font-size: 60px; color: rgba(197, 90, 255, .35); display: flex; align-items: center; justify-content: center; width: 190px; height: 266px;
   border: 3px dashed rgba(197, 90, 255, .35); border-radius: 12px; background: rgba(0,0,0,.25); }
 .aw-log { min-height: 44px; font-size: 14px; color: #c9b3e6; text-align: center; margin: 6px 0; line-height: 1.5; }
 .aw-log b { color: #ffd36b; }
+.aw-hand { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; width: 100%; }
 .aw-hand-title { text-align: center; font-family: 'Bangers', cursive; letter-spacing: 2px; font-size: 15px; color: #8fe9ff; margin-top: 4px; }
 .aw-rule { text-align: center; font-size: 12.5px; color: #a990c9; margin: 4px auto 8px; max-width: 900px; }
 
-/* Boutons dans l’arène */
+/* Boutons dans l’arène uniquement */
 #arena-war .btn, #arena-war .mbtn {
   font-family: 'Bangers', cursive;
   color: #1a0526;
@@ -357,11 +359,44 @@
   border: none;
   border-radius: 999px;
   box-shadow: 0 6px 0 #5a18c9, 0 0 18px rgba(197, 90, 255, .4);
+  min-width: 260px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 #arena-war .btn:hover:not(:disabled), #arena-war .mbtn:hover:not(:disabled) {
   background: linear-gradient(180deg, #f5d0ff, #c07aff);
   transform: translateY(-1px);
 }
+
+/* Animations */
+.aw-swipe { animation: awSwipe .46s cubic-bezier(.2, .8, .2, 1); }
+@keyframes awSwipe { 0% { transform: translate(-70px, 130px) rotate(-16deg) scale(.62); opacity: 0; } 58% { transform: translate(10px, -10px) rotate(3deg) scale(1.1); opacity: 1; } 100% { transform: none; opacity: 1; } }
+.aw-reveal { animation: awReveal .5s cubic-bezier(.15, .7, .2, 1); }
+@keyframes awReveal { 0% { transform: perspective(900px) translate(90px, -120px) rotateY(88deg) rotateZ(14deg) scale(.6); opacity: 0; } 62% { transform: perspective(900px) translate(-8px, 6px) rotateY(-6deg) scale(1.08); opacity: 1; } 100% { transform: none; opacity: 1; } }
+.aw-reveal.win { animation: awReveal .42s cubic-bezier(.15, .7, .2, 1), awSlam .5s ease .38s; }
+.aw-reveal.lose { animation: awReveal .42s cubic-bezier(.15, .7, .2, 1), awBurn 1s ease .4s forwards; }
+.awc.win { border-color: #eaffea; box-shadow: 0 0 28px rgba(197, 90, 255, .7); }
+@keyframes awSlam { 0% { transform: scale(1); } 20% { transform: scale(1.2) rotate(-3deg); filter: brightness(1.7); } 42% { transform: scale(.94) rotate(2deg); } 100% { transform: scale(1); filter: none; } }
+.awc.lose { animation: awBurn 1s ease forwards; }
+@keyframes awBurn { 0% { filter: brightness(1); transform: scale(1); } 12% { filter: brightness(2.2) saturate(1.6); transform: scale(1.12) rotate(4deg); } 35% { filter: brightness(.55) sepia(.8) hue-rotate(70deg); transform: rotate(-6deg) scale(.9); } 100% { filter: brightness(.12) grayscale(1); transform: scale(.55) rotate(8deg); opacity: .2; } }
+.awc.tie2 { animation: awTie .7s ease forwards; }
+@keyframes awTie { to { filter: grayscale(.7) brightness(.5); opacity: .4; transform: scale(.93); } }
+.aw-pop { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%); z-index: 9; pointer-events: none;
+  font-family: 'Bangers', cursive; font-weight: 700; font-size: 64px; color: #ffb8e6; text-shadow: 0 0 24px rgba(197, 90, 255, .8), 0 4px 0 #000;
+  animation: awPop 1.4s ease forwards; }
+.aw-pop.red { color: #ff4d4d; text-shadow: 0 0 24px rgba(255, 40, 40, .9), 0 4px 0 #000; }
+.aw-pop.grey { color: #a990c9; text-shadow: 0 0 18px rgba(197, 90, 255, .4); }
+@keyframes awPop { 0% { transform: translate(-50%, -50%) scale(.4); opacity: 0; } 18% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } 75% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+
+/* Loading */
+#aw-loading { position: fixed; inset: 0; z-index: 31; display: none; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 50% 40%, #062010 0%, #000 72%); }
+#aw-loading .aw-load-title { font-family: 'Bangers', cursive; font-size: 40px; letter-spacing: 4px; color: #e9b8ff; text-shadow: 0 0 26px rgba(197, 90, 255, .7); animation: awPulse 1.2s ease-in-out infinite alternate; }
+@keyframes awPulse { from { transform: scale(1); } to { transform: scale(1.06); } }
+#aw-loading .aw-load-sub { margin-top: 10px; font-size: 14px; color: #d9c2ff; }
+#aw-loading .aw-load-bar { width: min(420px, 80vw); height: 8px; margin-top: 26px; border-radius: 4px; background: #000; overflow: hidden; border: 1px solid rgba(197, 90, 255, .4); }
+#aw-loading .aw-load-bar div { height: 100%; width: 0; background: linear-gradient(90deg, #c55aff, #ffb8e6); box-shadow: 0 0 14px rgba(197, 90, 255, .6); transition: width .35s ease; }
   /* ======== VAISSEAU (hub) ======== */
   #hub { position: fixed; inset: 0; z-index: 18; display: none; pointer-events: none; color: #f2e6ff; }
   #hub > * { pointer-events: auto; }
