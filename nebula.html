@@ -330,28 +330,7 @@
   font-size: 58px; color: var(--sc, #00ff41); text-shadow: 0 0 18px var(--sc, rgba(0, 255, 65, .8)); }
 .awc.back small { font-size: 11px; color: #5dcc78; letter-spacing: 2px; text-shadow: none; }
   /* --- carte rectangulaire détaillée (ratio ~3:4 façon LS) --- */
-  .awc { width: 118px; padding: 6px; border-radius: 4px; text-align: center; position: relative;
-    background: linear-gradient(165deg, #0a1a0e, #000 72%); border: 2px solid #00ff41; box-shadow: 0 4px 14px rgba(0,0,0,.7), inset 0 0 12px rgba(0, 255, 65, .08); }
-  .awc-art { height: 86px; border-radius: 2px; background-size: cover; background-position: center top; border: 1px solid rgba(0, 255, 65, .28); }
-  .awc-n { font-size: 11px; font-weight: 600; color: #d8ffe4; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .awc-sp { font-size: 9px; color: #5dcc78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .awc-s { font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: #00ff41; text-shadow: 0 0 8px rgba(0, 255, 65, .7); margin-top: 1px; }
-  .awc-s small { font-family: 'Courier New', monospace; font-size: 11px; color: #9dffb4; text-shadow: none; }
-  .awc.fx1 { border-style: double; border-color: #00cc33; box-shadow: 0 0 12px rgba(0, 255, 65, .45); }
-  .awc.fx2 { border-color: #b6ff6a; box-shadow: 0 0 14px rgba(182, 255, 106, .55), inset 0 0 14px rgba(0, 255, 65, .12); animation: awGlow 3s ease-in-out infinite alternate; }
-  .awc.fx3 { border-color: #eaffea; box-shadow: 0 0 18px rgba(0, 255, 65, .75), inset 0 0 18px rgba(0, 255, 65, .16); animation: awGlow 2.2s ease-in-out infinite alternate; }
-  @keyframes awGlow { from { filter: brightness(1); } to { filter: brightness(1.18); } }
-  .awc.hand { cursor: pointer; transition: transform .12s, box-shadow .12s; }
-  .awc.hand:hover { transform: translateY(-10px) scale(1.08); box-shadow: 0 10px 22px rgba(0, 255, 65, .55); z-index: 5; }
-  .awc.duel { width: 190px; }
-  .awc.duel .awc-art { height: 152px; }
-  .awc.duel .awc-n { font-size: 14px; }
-  .awc.duel .awc-sp { font-size: 11px; }
-  .awc.duel .awc-s { font-size: 26px; }
-  .awc.back { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 190px; height: 266px;
-    background: repeating-linear-gradient(45deg, #000, #000 8px, #031208 8px, #031208 16px); border: 2px solid #00ff41;
-    font-size: 58px; color: #00ff41; text-shadow: 0 0 18px rgba(0, 255, 65, .8); }
-  .awc.back small { font-size: 11px; color: #5dcc78; letter-spacing: 2px; text-shadow: none; }
+
   /* --- animations de duel : swipe LS + impact --- */
   .aw-swipe { animation: awSwipe .46s cubic-bezier(.2, .8, .2, 1); }
   @keyframes awSwipe { 0% { transform: translate(-70px, 130px) rotate(-16deg) scale(.62); opacity: 0; } 58% { transform: translate(10px, -10px) rotate(3deg) scale(1.1); opacity: 1; } 100% { transform: none; opacity: 1; } }
