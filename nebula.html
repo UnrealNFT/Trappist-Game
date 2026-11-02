@@ -3098,16 +3098,23 @@ function awOnlineCard(c) { // carte d'un adversaire EN LIGNE : stats recalculée
   const mA = t ? 1.5 * Math.pow(1.3, t - 1) : 1, mH = t ? 1.7 * Math.pow(1.35, t - 1) : 1; // mêmes bonus que registerFusion
   return { sp: c.sp, base: c.sp, name: c.name || bs.name, lvl: c.lvl, fx: t ? { base: c.sp, tier: t } : null, ref: null,
     atk: +(bs.dmg / 5 * lvlMul(c.lvl) * mA).toFixed(1), hp: Math.round(bs.hp * lvlMul(c.lvl) * mH) };
-}
-function startArenaBattle(online) { // online = { wallet, name, deck } pour un duel contre le deck d'un VRAI joueur (piloté par l'IA)
+}function startArenaBattle(online) { // online = { wallet, name, deck } pour un duel contre le deck d'un VRAI joueur (piloté par l'IA)
   if (!awSel || awSel.size !== AW_DECK) return;
-  const myHand = awShuffle([...awSel].map(i => awCardFrom(arena[i], arena[i])));
-  const aiHand = awShuffle(online ? online.deck.map(awOnlineCard) : awAIDeck());
+  const myFull = awShuffle([...awSel].map(i => awCardFrom(arena[i], arena[i])));
+  const aiFull = awShuffle(online ? online.deck.map(awOnlineCard) : awAIDeck());
+
+  // Pioche de départ : 5 cartes
+  const HAND_SIZE = 5;
+  const myHand = myFull.splice(0, HAND_SIZE);
+  const aiHand = aiFull.splice(0, HAND_SIZE);
+
   awShowLoading(online ? L(`Duel en ligne · ${online.name}`, `Online duel · ${online.name}`) : L('Duel démo · NÉBUL-IA', 'Demo duel · NÉBUL-IA'), () => {
-    AB = { me: { score: 0, hand: myHand, staged: null },
-           ai: { score: 0, hand: aiHand, staged: null },
-           round: 1, over: false, lock: false, reveal: false, winSide: null,
-           online: online ? { wallet: online.wallet, name: online.name } : null };
+    AB = { 
+      me: { score: 0, hand: myHand, deck: myFull, staged: null },
+      ai: { score: 0, hand: aiHand, deck: aiFull, staged: null },
+      round: 1, over: false, lock: false, reveal: false, winSide: null,
+      online: online ? { wallet: online.wallet, name: online.name } : null 
+    };
     $('aw-select').style.display = 'none'; $('aw-duel').style.display = 'block';
     $('aw-log').innerHTML = '';
     awLog(online
@@ -3117,6 +3124,7 @@ function startArenaBattle(online) { // online = { wallet, name, deck } pour un d
     awRender();
   });
 }
+
 async function awOnlineFight() { // JcJ asynchrone : ton deck monte sur le serveur, tu affrontes le deck d'un autre joueur
   if (!W.real || !awSel || awSel.size !== AW_DECK) return;
   const st = $('aw-online-st');
@@ -3158,6 +3166,11 @@ function awPlay(i) { // tu poses ta carte — l'IA a déjà choisi la sienne en 
   AB.lock = true;
   AB.me.staged = AB.me.hand.splice(i, 1)[0];
   AB.ai.staged = AB.ai.hand.splice(Math.random() * AB.ai.hand.length | 0, 1)[0]; // choix secret de l'IA
+
+  // Pioche une nouvelle carte si le deck n’est pas vide
+  if (AB.me.deck && AB.me.deck.length) AB.me.hand.push(AB.me.deck.shift());
+  if (AB.ai.deck && AB.ai.deck.length) AB.ai.hand.push(AB.ai.deck.shift());
+
   AB.reveal = false; AB.winSide = null;
   sfx.swap();
   awRender({ mineNew: true }); // ta carte tombe dans l'arène, celle de l'IA reste face cachée
