@@ -363,8 +363,19 @@
   #aw-sel-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-height: 58vh; overflow-y: auto; padding: 6px; }
   #aw-sel-grid .awc { cursor: pointer; transition: transform .1s; }
   #aw-sel-grid .awc:hover { transform: scale(1.06); }
-  .awc.sel2 { box-shadow: 0 0 16px rgba(0, 255, 65, .75); border-color: #00ff41; }
-  .awc.sel2::after { content: '✓'; position: absolute; top: 4px; left: 6px; color: #00ff41; font-weight: 900; text-shadow: 0 0 8px #00ff41; }
+.awc.sel2 { 
+  box-shadow: 0 0 16px var(--sc, rgba(0, 255, 65, .75)); 
+  border-color: var(--sc, #00ff41); 
+}
+.awc.sel2::after { 
+  content: '✓'; 
+  position: absolute; 
+  top: 4px; 
+  left: 6px; 
+  color: var(--sc, #00ff41); 
+  font-weight: 900; 
+  text-shadow: 0 0 8px var(--sc, #00ff41); 
+}
   .awc.off { opacity: .35; filter: grayscale(.7); }
   #aw-fight { display: block; margin: 16px auto 4px; min-width: 260px; }
   #aw-fight:disabled, #aw-online:disabled { opacity: .4; cursor: not-allowed; }
