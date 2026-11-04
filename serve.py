@@ -204,31 +204,35 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self._json({"error": e.read()[:250].decode('utf-8', 'ignore')}, e.code)
             except Exception as e:
                 return self._json({"error": str(e)[:250]}, 502)
-                        # ========== PARTNER API (SkyLaws) ==========
+                                             # ========== PARTNER API (SkyLaws) ==========
         if urlparse(self.path).path == "/api/partner/generate/image":
             try:
                 n = int(self.headers.get('Content-Length') or 0)
                 data = json.loads(self.rfile.read(n) or b"{}")
                 api_key = self.headers.get("X-API-Key", "")
 
-                PARTNERS = {
-                    "skylaws-pilot": {"name": "SkyLaws", "balance": 0.0},
+                # Clé API → wallet lié (à remplir avec le vrai wallet de SkyLaws)
+                PARTNER_WALLETS = {
+                    "skylaws-pilot": "METTRE_LE_WALLET_ICI",  # ex: 01abc...
                 }
 
-                partner = PARTNERS.get(api_key)
-                if not partner:
+                wallet = PARTNER_WALLETS.get(api_key)
+                if not wallet:
                     return self._json({"error": "Invalid API key"}, 401)
 
                 model = data.get("model", "schnell")
-                cost = 0.01 if model == "schnell" else 0.04
+                tokens_needed = 1 if model == "schnell" else 2
 
-                if partner["balance"] < cost:
-                    return self._json({"error": "Insufficient partner balance"}, 402)
+                # Vérifier le vrai solde
+                bal, err = tc_balance(wallet)
+                if err or bal < tokens_needed:
+                    return self._json({"error": "Insufficient tokens", "balance": bal}, 402)
 
                 prompt = data.get("prompt", "").strip()
                 if not prompt:
                     return self._json({"error": "prompt required"}, 400)
 
+                # Génération
                 model_id = "wavespeed-ai/flux-dev" if model == "dev" else IMG_MODEL
                 r = post(f"{BASE}/{model_id}", {
                     "prompt": prompt,
@@ -244,37 +248,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 if not url:
                     return self._json({"error": "Generation failed"}, 500)
 
-                partner["balance"] -= cost
+                # Débit réel via le backend TrappistAI
+                try:
+                    tc_post("/api/generate/image", {"walletAddress": wallet, "prompt": prompt})
+                except Exception:
+                    pass  # la génération a déjà réussi, on ne bloque pas
 
                 return self._json({
                     "success": True,
                     "url": url,
                     "model": model,
-                    "cost": cost,
-                    "remaining_balance": round(partner["balance"], 2),
+                    "tokens_used": tokens_needed,
+                    "remaining_balance": bal - tokens_needed,
                 })
             except Exception as e:
                 return self._json({"error": str(e)[:300]}, 500)
-        self.send_error(404)
-
-    def do_GET(self):
-        u = urlparse(self.path)
-        if u.path == "/api/fuse_status":
-            job = JOBS.get(parse_qs(u.query).get("id", [""])[0])
-            return self._json(job or {"status": "error", "error": "job inconnu"}, 200 if job else 404)
-        # proxy trappist.land : /api/tc/<chemin> -> TC_API/api/<chemin>
-        if u.path.startswith("/api/tc/"):
-            p = self.path.replace("/api/tc", "/api", 1)
-            try:
-                return self._json(tc_get(p, timeout=45))
-            except urllib.error.HTTPError as e:
-                return self._json({"error": e.read()[:250].decode('utf-8', 'ignore')}, e.code)
-            except Exception as e:
-                return self._json({"error": str(e)[:250]}, 502)
-        super().do_GET()
-
-port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
-socketserver.ThreadingTCPServer.allow_reuse_address = True
-with socketserver.ThreadingTCPServer(('', port), Handler) as httpd:
-    print(f'Phénix Legends -> http://localhost:{port}/nebula.html', flush=True)
-    httpd.serve_forever()
