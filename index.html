@@ -2,11 +2,71 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Trappist Legend — NÉBULA</title>
-  <!-- Page d'accueil = le jeu actuel. L'ancien prototype vagues reste sur /arena_old.html -->
-  <meta http-equiv="refresh" content="0; url=/nebula.html">
+  <title>Trappist Legend — Choix du niveau</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0b0412 0%, #1a0b2e 50%, #0b0412 100%);
+      color: #e9b8ff; font-family: 'Poppins', sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    h1 {
+      font-family: 'Bangers', cursive; font-size: clamp(36px, 6vw, 64px);
+      letter-spacing: 3px; margin-bottom: 10px;
+      background: linear-gradient(180deg, #ffb8e6, #c55aff 55%, #5a18c9);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 0 22px rgba(197, 90, 255, .6)) drop-shadow(3px 4px 0 rgba(0,0,0,.5));
+    }
+    .subtitle { font-size: 18px; opacity: .9; margin-bottom: 40px; color: #e6ccff; }
+    .levels { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
+    .level-card {
+      background: rgba(15, 4, 32, .8); border: 2px solid rgba(197, 90, 255, .4);
+      border-radius: 20px; padding: 30px; width: 280px; text-align: center;
+      transition: all .3s; text-decoration: none; color: inherit;
+      box-shadow: 0 0 20px rgba(150, 40, 220, .2);
+    }
+    .level-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      border-color: #e9b8ff; box-shadow: 0 0 40px rgba(197, 90, 255, .5);
+    }
+    .level-card.green {
+      background: rgba(4, 32, 4, .8); border-color: rgba(90, 255, 90, .4);
+      box-shadow: 0 0 20px rgba(40, 220, 40, .2);
+    }
+    .level-card.green:hover {
+      border-color: #b8ffb8; box-shadow: 0 0 40px rgba(90, 255, 90, .5);
+    }
+    .level-icon { font-size: 60px; margin-bottom: 15px; }
+    .level-title { font-family: 'Bangers', cursive; font-size: 28px; margin-bottom: 8px; }
+    .level-desc { font-size: 14px; opacity: .8; line-height: 1.5; }
+    .level-badge {
+      display: inline-block; background: #c55aff; color: #fff;
+      font-size: 12px; padding: 4px 12px; border-radius: 999px;
+      margin-bottom: 12px; font-weight: 600;
+    }
+    .level-card.green .level-badge { background: #18c918; }
+  </style>
 </head>
-<body style="background:#0b0412;color:#e9b8ff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">
-  <p>🛸 Chargement de <b>Trappist Legend — NÉBULA</b>… <a href="/nebula.html" style="color:#c55aff">continuer</a></p>
+<body>
+  <h1>TRAPPIST LEGEND</h1>
+  <p class="subtitle">Choisis ta destination, explorateur 🛸</p>
+  
+  <div class="levels">
+    <a href="/nebula.html" class="level-card">
+      <div class="level-badge">NIVEAU 1</div>
+      <div class="level-icon">🌙</div>
+      <div class="level-title">NÉBULA</div>
+      <div class="level-desc">Lune mystérieuse de Trappist. Affronte les créatures cosmiques et collecte les Pokéballs.</div>
+    </a>
+    
+    <a href="/trappistland.html" class="level-card green">
+      <div class="level-badge">NIVEAU 2</div>
+      <div class="level-icon">🌍</div>
+      <div class="level-title">TRAPPISTLAND</div>
+      <div class="level-desc">Planète verte luxuriante. Nouvelle aventure, nouveaux ennemis, nouveaux défis.</div>
+    </a>
+  </div>
 </body>
 </html>
