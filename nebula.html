@@ -4112,5 +4112,26 @@ addEventListener('resize', () => {
   composer.setSize(innerWidth, innerHeight);
 });
 </script>
+
+<!-- ======== ÉCRAN DE VICTOIRE ======== -->
+<div id="victory-screen" style="display:none;position:fixed;inset:0;z-index:25;flex-direction:column;justify-content:center;align-items:center;background:radial-gradient(ellipse at center, rgba(10,80,10,.7), rgba(2,20,2,.95));color:#fff;text-align:center;">
+  <h1 style="font-family:'Bangers',cursive;font-size:clamp(44px,8vw,88px);letter-spacing:3px;background:linear-gradient(180deg,#b8ffb8,#5aff5a 55%,#18c918);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(90,255,90,.6)) drop-shadow(3px 4px 0 rgba(0,0,0,.5));">VICTOIRE !</h1>
+  <p style="font-size:20px;margin:16px 0;color:#ccffcc;">NÉBULA est nettoyée. Prêt pour la suite ?</p>
+  <div style="font-size:60px;margin:20px 0;filter:drop-shadow(0 0 15px #5aff5a);">🌍🌿🌱</div>
+  <a href="/trappistland.html" class="btn" style="font-family:'Bangers',cursive;font-size:32px;letter-spacing:2px;color:#052605;background:linear-gradient(180deg,#b8ffb8,#4dff4d);border:none;border-radius:999px;padding:14px 48px;cursor:pointer;box-shadow:0 6px 0 #18c918,0 0 30px rgba(90,255,90,.55);text-decoration:none;display:inline-block;margin-top:20px;">🚀 NIVEAU 2 — TRAPPISTLAND</a>
+  <p style="margin-top:24px;font-size:14px;opacity:.7;">Planète verte · Nouvelle aventure · Nouveaux ennemis</p>
+</div>
+
+<script>
+  // Fonction pour afficher l'écran de victoire
+  function showVictory() {
+    document.getElementById('victory-screen').style.display = 'flex';
+    document.exitPointerLock();
+  }
+  
+  // Exposer la fonction globalement pour pouvoir l'appeler depuis le jeu
+  window.showVictory = showVictory;
+</script>
+
 </body>
 </html>
