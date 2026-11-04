@@ -212,7 +212,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 api_key = self.headers.get("X-API-Key", "")
 
                 PARTNERS = {
-                    "skylaws-pilot": {"name": "SkyLaws", "balance": 100.0},
+                    "skylaws-pilot": {"name": "SkyLaws", "balance": 0.0},
                 }
 
                 partner = PARTNERS.get(api_key)
