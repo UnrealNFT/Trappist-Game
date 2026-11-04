@@ -204,16 +204,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self._json({"error": e.read()[:250].decode('utf-8', 'ignore')}, e.code)
             except Exception as e:
                 return self._json({"error": str(e)[:250]}, 502)
-                                             # ========== PARTNER API (SkyLaws) ==========
+
+        # ========== PARTNER API (SkyLaws) ==========
         if urlparse(self.path).path == "/api/partner/generate/image":
             try:
                 n = int(self.headers.get('Content-Length') or 0)
                 data = json.loads(self.rfile.read(n) or b"{}")
                 api_key = self.headers.get("X-API-Key", "")
 
-                # Clé API → wallet lié (à remplir avec le vrai wallet de SkyLaws)
+                # Clé API → wallet lié (remplace par le vrai wallet de SkyLaws)
                 PARTNER_WALLETS = {
-                    "skylaws-pilot": "METTRE_LE_WALLET_ICI",  # ex: 01abc...
+                    "skylaws-pilot": "METTRE_LE_WALLET_ICI",
                 }
 
                 wallet = PARTNER_WALLETS.get(api_key)
@@ -252,7 +253,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 try:
                     tc_post("/api/generate/image", {"walletAddress": wallet, "prompt": prompt})
                 except Exception:
-                    pass  # la génération a déjà réussi, on ne bloque pas
+                    pass
 
                 return self._json({
                     "success": True,
@@ -263,3 +264,27 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 })
             except Exception as e:
                 return self._json({"error": str(e)[:300]}, 500)
+
+        self.send_error(404)
+
+    def do_GET(self):
+        u = urlparse(self.path)
+        if u.path == "/api/fuse_status":
+            job = JOBS.get(parse_qs(u.query).get("id", [""])[0])
+            return self._json(job or {"status": "error", "error": "job inconnu"}, 200 if job else 404)
+        # proxy trappist.land : /api/tc/<chemin> -> TC_API/api/<chemin>
+        if u.path.startswith("/api/tc/"):
+            p = self.path.replace("/api/tc", "/api", 1)
+            try:
+                return self._json(tc_get(p, timeout=45))
+            except urllib.error.HTTPError as e:
+                return self._json({"error": e.read()[:250].decode('utf-8', 'ignore')}, e.code)
+            except Exception as e:
+                return self._json({"error": str(e)[:250]}, 502)
+        super().do_GET()
+
+port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
+socketserver.ThreadingTCPServer.allow_reuse_address = True
+with socketserver.ThreadingTCPServer(('', port), Handler) as httpd:
+    print(f'Phénix Legends -> http://localhost:{port}/nebula.html', flush=True)
+    httpd.serve_forever()
