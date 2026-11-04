@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trappist Legend — TRAPPISTLAND · Planète verte</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0a1f0a; font-family: 'Poppins', sans-serif; }
+  canvas { display: block; }
+
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0; padding: 14px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+    pointer-events: none; z-index: 10;
+  }
+  .hud-box {
+    background: rgba(4, 32, 4, .6); backdrop-filter: blur(6px);
+    border: 1px solid rgba(90, 255, 90, .45); border-radius: 14px;
+    color: #e6ffe6; padding: 8px 18px;
+    font-family: 'Bangers', cursive; font-size: 26px; letter-spacing: 1px;
+    text-shadow: 0 0 12px rgba(90, 255, 90, .8), 2px 2px 0 rgba(0,0,0,.6);
+    box-shadow: 0 0 18px rgba(40, 220, 40, .25), inset 0 0 12px rgba(40, 220, 40, .12);
+  }
+  #hearts { font-size: 24px; letter-spacing: 3px; }
+
+  #crosshair {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    z-index: 11; pointer-events: none; width: 26px; height: 26px;
+  }
+  #crosshair::before, #crosshair::after {
+    content: ''; position: absolute; background: #b8ffb8;
+    box-shadow: 0 0 6px #5aff5a, 0 0 2px #fff;
+  }
+  #crosshair::before { left: 50%; top: 0; width: 2px; height: 100%; transform: translateX(-50%); clip-path: polygon(0 0, 100% 0, 100% 38%, 0 38%, 0 62%, 100% 62%, 100% 100%, 0 100%); }
+  #crosshair::after { top: 50%; left: 0; height: 2px; width: 100%; transform: translateY(-50%); clip-path: polygon(0 0, 38% 0, 38% 100%, 0 100%, 62% 0, 100% 0, 100% 100%, 62% 100%); }
+
+  #title-screen {
+    position: fixed; inset: 0; z-index: 20;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: radial-gradient(ellipse at center, rgba(10,80,10,.55), rgba(2,20,2,.9));
+    color: #fff; text-align: center;
+  }
+  h1 {
+    font-family: 'Bangers', cursive; font-size: clamp(44px, 8vw, 88px);
+    letter-spacing: 3px;
+    background: linear-gradient(180deg, #b8ffb8, #5aff5a 55%, #18c918);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 22px rgba(90, 255, 90, .6)) drop-shadow(3px 4px 0 rgba(0,0,0,.5));
+  }
+  .subtitle { font-size: 18px; opacity: .92; margin: 10px 0 4px; color: #ccffcc; }
+  .controls {
+    margin: 18px 0 26px; font-size: 15px; line-height: 1.9;
+    background: rgba(90, 255, 90, .08); border-radius: 12px; padding: 12px 26px;
+    border: 1px solid rgba(90, 255, 90, .3); color: #dcf5dc;
+  }
+  .controls b { color: #b8ffb8; }
+  .btn {
+    font-family: 'Bangers', cursive; font-size: 30px; letter-spacing: 2px;
+    color: #052605; background: linear-gradient(180deg, #b8ffb8, #4dff4d);
+    border: none; border-radius: 999px; padding: 12px 44px; cursor: pointer;
+    box-shadow: 0 6px 0 #18c918, 0 0 30px rgba(90, 255, 90, .55);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .btn:hover { transform: translateY(-2px) scale(1.04); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #18c918; }
+
+  #vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 5;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.6) 100%);
+  }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div class="hud-box">🌍 TRAPPISTLAND</div>
+  <div class="hud-box" id="hearts">❤️❤️❤️</div>
+  <div class="hud-box">NIVEAU 2</div>
+</div>
+
+<div id="crosshair"></div>
+<div id="vignette"></div>
+
+<div id="title-screen">
+  <h1>TRAPPISTLAND</h1>
+  <p class="subtitle">Planète verte — Niveau 2</p>
+  <div class="controls">
+    <b>🎮 Contrôles</b><br>
+    ZQSD / WASD — Se déplacer<br>
+    Souris — Regarder<br>
+    Clic — Tirer
+  </div>
+  <button class="btn" onclick="startGame()">🚀 EXPLORER</button>
+</div>
+
+<canvas id="game"></canvas>
+
+<script>
+// ====== TRAPPISTLAND — Planète verte vierge (Niveau 2) ======
+// TODO: Ajouter le décor, les créatures, les mécaniques de jeu
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let W, H;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// État du jeu
+const game = {
+  started: false,
+  player: { x: 0, y: 0, hp: 3 },
+  keys: {}
+};
+
+// Input
+document.addEventListener('keydown', e => game.keys[e.key.toLowerCase()] = true);
+document.addEventListener('keyup', e => game.keys[e.key.toLowerCase()] = false);
+
+function startGame() {
+  document.getElementById('title-screen').style.display = 'none';
+  game.started = true;
+  requestAnimationFrame(loop);
+}
+
+function update(dt) {
+  if (!game.started) return;
+  // TODO: Logique de jeu
+}
+
+function draw() {
+  // Fond vert simple
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0a2f0a');
+  grad.addColorStop(0.5, '#0d3d0d');
+  grad.addColorStop(1, '#081f08');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // TODO: Dessiner le décor, le joueur, les ennemis
+
+  // Placeholder texte
+  ctx.font = '24px Poppins';
+  ctx.fillStyle = 'rgba(184, 255, 184, 0.6)';
+  ctx.textAlign = 'center';
+  ctx.fillText('🌍 TRAPPISTLAND — Zone à explorer', W/2, H/2 - 40);
+  ctx.fillText('(Planète vierge — à habiller)', W/2, H/2 + 10);
+}
+
+let last = 0;
+function loop(t) {
+  const dt = (t - last) / 1000;
+  last = t;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+</script>
+
+</body>
+</html>
