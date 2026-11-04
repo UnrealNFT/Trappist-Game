@@ -204,6 +204,57 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self._json({"error": e.read()[:250].decode('utf-8', 'ignore')}, e.code)
             except Exception as e:
                 return self._json({"error": str(e)[:250]}, 502)
+                        # ========== PARTNER API (SkyLaws) ==========
+        if urlparse(self.path).path == "/api/partner/generate/image":
+            try:
+                n = int(self.headers.get('Content-Length') or 0)
+                data = json.loads(self.rfile.read(n) or b"{}")
+                api_key = self.headers.get("X-API-Key", "")
+
+                PARTNERS = {
+                    "skylaws-pilot": {"name": "SkyLaws", "balance": 100.0},
+                }
+
+                partner = PARTNERS.get(api_key)
+                if not partner:
+                    return self._json({"error": "Invalid API key"}, 401)
+
+                model = data.get("model", "schnell")
+                cost = 0.01 if model == "schnell" else 0.04
+
+                if partner["balance"] < cost:
+                    return self._json({"error": "Insufficient partner balance"}, 402)
+
+                prompt = data.get("prompt", "").strip()
+                if not prompt:
+                    return self._json({"error": "prompt required"}, 400)
+
+                model_id = "wavespeed-ai/flux-dev" if model == "dev" else IMG_MODEL
+                r = post(f"{BASE}/{model_id}", {
+                    "prompt": prompt,
+                    "size": "1024*1024",
+                    "output_format": "png",
+                    "num_images": 1,
+                    "seed": random.randint(1, 2**31 - 1),
+                })
+                tid = (r.get("data") or {}).get("id") or r.get("id")
+                out = poll(tid, "partner image")
+                url = out[0] if out else None
+
+                if not url:
+                    return self._json({"error": "Generation failed"}, 500)
+
+                partner["balance"] -= cost
+
+                return self._json({
+                    "success": True,
+                    "url": url,
+                    "model": model,
+                    "cost": cost,
+                    "remaining_balance": round(partner["balance"], 2),
+                })
+            except Exception as e:
+                return self._json({"error": str(e)[:300]}, 500)
         self.send_error(404)
 
     def do_GET(self):
