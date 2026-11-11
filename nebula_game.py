@@ -43,6 +43,8 @@ REFUSION_COST_TOKENS = 2
 
 # Stockage des cartes fusionnées par wallet
 player_cards = {}
+# Accès libre à trappist.land (pas de cadenas)
+ALLOW_TRAPPISLAND = True
 
 # Endpoint /api/game/fuse retourne l'URL et la liste des cartes
 /api/game/fuse {
