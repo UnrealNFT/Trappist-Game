@@ -83,6 +83,7 @@ _TIER_STYLE = {
     2: "mega evolved form, larger and even more elaborate",
     3: "ancient colossal alpha form, extremely elaborate",
     4: "godlike mythical form, majestic and divine",
+    5: "trappist.laand form, transcendent cosmic deity",
 }
 _ROMAN = ["II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 
