@@ -41,6 +41,15 @@ router = APIRouter()
 FUSION_COST_TOKENS = 1
 REFUSION_COST_TOKENS = 2
 
+# Stockage des cartes fusionnées par wallet
+player_cards = {}
+
+# Endpoint /api/game/fuse retourne l'URL et la liste des cartes
+/api/game/fuse {
+  "url": "https://example.com/fuse",
+  "cards": ["NÉBULA", "TRAPPIST", ...]
+}
+
 # descriptions de base des espèces (reprises du pipeline de génération du jeu)
 _SPECIES = {
     "turtle": ("a bipedal humanoid turtle warrior mascot standing upright on two strong legs, spiked dark obsidian shell "
@@ -83,7 +92,6 @@ _TIER_STYLE = {
     2: "mega evolved form, larger and even more elaborate",
     3: "ancient colossal alpha form, extremely elaborate",
     4: "godlike mythical form, majestic and divine",
-    5: "trappist.laand form, transcendent cosmic deity",
 }
 _ROMAN = ["II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 
