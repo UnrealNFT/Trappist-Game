@@ -10,8 +10,19 @@
   status = 200
   force = true
 
-# la racine ouvre directement le jeu
+# la racine ouvre le menu de choix des niveaux
 [[redirects]]
   from = "/"
+  to = "/index.html"
+  status = 302
+
+# accès direct aux niveaux
+[[redirects]]
+  from = "/nebula"
   to = "/nebula.html"
+  status = 302
+
+[[redirects]]
+  from = "/trappistland"
+  to = "/trappistland.html"
   status = 302
