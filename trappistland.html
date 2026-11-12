@@ -131,7 +131,15 @@ function startGame() {
 
 function update(dt) {
   if (!game.started) return;
-  // TODO: Logique de jeu
+  // Déplacement joueur
+  const speed = 120;
+  if (game.keys['z'] || game.keys['w']) game.player.y -= speed * dt;
+  if (game.keys['q'] || game.keys['s']) game.player.y += speed * dt;
+  if (game.keys['a']) game.player.x -= speed * dt;
+  if (game.keys['d']) game.player.x += speed * dt;
+  // Limites du monde
+  game.player.x = Math.max(-W/2, Math.min(W/2, game.player.x));
+  game.player.y = Math.max(-H/2, Math.min(H/2, game.player.y));
 }
 
 function draw() {
@@ -143,7 +151,30 @@ function draw() {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // TODO: Dessiner le décor, le joueur, les ennemis
+  // Décor : arbres, rochers, herbe
+  // Arbres (troncs marron, feuillage vert)
+  for (let i = 0; i < 15; i++) {
+    const tx = -W/2 + Math.random() * W;
+    const ty = -H/2 + Math.random() * H;
+    ctx.fillStyle = '#3d2818';
+    ctx.fillRect(tx, ty, 12, 24);
+    ctx.fillStyle = '#2a5a2a';
+    ctx.beginPath();
+    ctx.arc(tx, ty - 12, 28, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // Rochers gris
+  for (let i = 0; i < 8; i++) {
+    const rx = -W/2 + Math.random() * W;
+    const ry = -H/2 + Math.random() * H;
+    ctx.fillStyle = '#5a5a5a';
+    ctx.beginPath();
+    ctx.arc(rx, ry, 12 + Math.random() * 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // Herbe au sol
+  ctx.fillStyle = 'rgba(90, 220, 90, 0.15)';
+  ctx.fillRect(-W/2, -H/2, W, H);
 
   // Placeholder texte
   ctx.font = '24px Poppins';
